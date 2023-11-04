@@ -8,7 +8,6 @@ const cors = require("cors");
 const bodypaser = require("body-parser");
 const authRouter = require("./routes/auth");
 const itemRouter = require("./routes/Items");
-const specificationRouter = require("./routes/Spesifications");
 const warehouseRouter = require("./routes/Warehouse");
 const typeRouter = require("./routes/Types");
 const pendingRouter = require("./routes/Pendings");
@@ -49,7 +48,6 @@ app.use(
 //routs
 app.use("/api/auth", authRouter)
 app.use("/api/items", itemRouter)
-app.use("/api/specification", specificationRouter)
 app.use("/api/warehouse", warehouseRouter)
 app.use("/api/type", typeRouter)
 app.use("/api/pending", pendingRouter)
