@@ -25,6 +25,10 @@ const addWarehouse = async (req, res) => {
             const currentUser = await Admin.findById(userInfo.id);
             if (!currentUser) return res.status(403).json("only admin can add Warehouses")
             if (currentUser.type != "admin") return res.status(403).json("only admin can add Warehouses")
+
+            const existing = await Warehouse.findOne(req.body)
+            if (existing) return res.status(409).json("Name Should be unique!!");
+
             const newWarehouse = new Warehouse(req.body);
             //save and respond 
             const warehouse = await newWarehouse.save();
