@@ -48,7 +48,7 @@ const transaction = async (req, res) => {
                 amount: amount,
                 paymentDate: paymentDate,
                 phone: phone,
-                cheque: cheque,
+                cheque: cheque || "____",
                 sellType: "retail",
             });
             await newpendingItem.save();

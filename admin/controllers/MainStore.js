@@ -89,7 +89,7 @@ const HoleSall = async (req, res) => {
                     phone: phone,
                     warehouseName: item.warehouseName,
                     paymentDate: paymentDate,
-                    cheque: cheque,
+                    cheque: cheque || "____",
                 });
                 await newCcredit.save();
             } else {
