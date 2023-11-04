@@ -47,4 +47,4 @@ const CreditSchema = new mongoose.Schema({
     { timestamps: true },
 );
 
-module.exports = mongoose.model("CreditSchema", CreditSchema);
+module.exports = mongoose.model("Credits", CreditSchema);

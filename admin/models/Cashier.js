@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const CshierSchema = new mongoose.Schema({
+const CashierSchema = new mongoose.Schema({
     adminName: {
         type: String,
         require: true,
@@ -33,4 +33,4 @@ const CshierSchema = new mongoose.Schema({
     { timestamps: true },
 );
 
-module.exports = mongoose.model("Cshier", CshierSchema);
+module.exports = mongoose.model("Cashier", CashierSchema);
