@@ -25,9 +25,9 @@ const addItem = async (req, res) => {
             const currentUser = await Admin.findById(userInfo.id);
             if (!currentUser) return res.status(403).json("only admin can add items")
             if (currentUser.type != "admin") return res.status(403).json("only admin can add items")
-            const exists = await Items.findOne({ itemCode: req.body.itemCode })
-            if (exists) return res.status(403).json("Item Code must be Unique!")
             const itemCode = req.body.itemCode
+            const exists = await Items.findOne({ itemCode: itemCode })
+            if (exists) return res.status(403).json("Item Code must be Unique!")
             if (!itemCode) return res.status(403).json("Item Code is required!")
             const newItme = new Items(req.body);
             //save and respond 
@@ -52,6 +52,8 @@ const updateItem = async (req, res) => {
         if (currentUser.type != "admin") return res.status(403).json("only admin can update items!")
         const tobeUpdated = req.params.id;
         const itemCode = req.body.initialItemcode;
+        const exists = await Items.findOne({ itemCode: itemCode })
+        if (exists) return res.status(403).json("Item Code must be Unique!")
         try {
             await Items.findByIdAndUpdate(tobeUpdated, {
                 $set: req.body,

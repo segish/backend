@@ -8,10 +8,12 @@ const CashierSchema = new mongoose.Schema({
     email: {
         type: String,
         require: true,
+        unique: true,
     },
     phone: {
         type: String,
         require: true,
+        unique: true,
     },
     type: {
         type: String,

@@ -4,6 +4,7 @@ const TypeSchema = new mongoose.Schema({
     type: {
         type: String,
         require: true,
+        unique: true,
     },
 },
     { timestamps: true }
