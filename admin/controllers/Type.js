@@ -8,7 +8,6 @@ const History = require("../models/History")
 const Item = require("../models/Items")
 const Pending = require("../models/Pending")
 const SellsHistory = require("../models/SellsHistory")
-const Specification = require("../models/Specifications")
 const ToShopPending = require("../models/ToShopPending")
 const Admin = require("../models/Admin")
 const dotenv = require("dotenv");
@@ -92,11 +91,6 @@ const updateType = async (req, res) => {
                 },
             })
             await SellsHistory.updateMany({ type: initialValue }, {
-                $set: {
-                    type: req.body.type,
-                },
-            })
-            await Specification.updateMany({ type: initialValue }, {
                 $set: {
                     type: req.body.type,
                 },
