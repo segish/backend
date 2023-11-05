@@ -51,6 +51,8 @@ const updateWarehouse = async (req, res) => {
         if (!currentUser) return res.status(403).json("only admin can update Warehouses")
         if (currentUser.type != "admin") return res.status(403).json("only admin can update Warehouses!")
         const tobeUpdated = req.params.id;
+        const existing = await Warehouse.findOne(req.body)
+        if (existing && existing._id !== tobeUpdated) return res.status(409).json("Name Should be unique!!");
         try {
             const initialwarehouse = await Warehouse.findById(tobeUpdated)
             const initialValue = initialwarehouse.name;

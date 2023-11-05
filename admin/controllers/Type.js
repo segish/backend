@@ -48,8 +48,10 @@ const updateType = async (req, res) => {
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can update Types")
         if (currentUser.type != "admin") return res.status(403).json("only admin can update Types!")
-        if (await Type.findOne(req.body)) return res.status(409).json("Item type Should be unique!!");
         const tobeUpdated = req.params.id;
+        const exists = await Type.findOne(req.body)
+        if (exists && exists._id !== tobeUpdated) return res.status(409).json("Item type Should be unique!!");
+        if (exists && exists._id === tobeUpdated) return res.status(200).json("Nothing changed!!");
         try {
             const initialtype = await Type.findById(tobeUpdated)
             const initialValue = initialtype.type;

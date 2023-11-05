@@ -137,7 +137,7 @@ const otpChek = async (req, res) => {
         const otp = parseInt(req.body.otp)
         if (savedOTPs[phone] !== otp) return res.status(404).json("incorrect otp or otp expired");
 
-       else return res.status(200).json("correct");
+        else return res.status(200).json("correct");
 
     } catch (err) {
         return res.status(500).json("Somthing went wrong")
@@ -228,13 +228,23 @@ const updateUser = async (req, res) => {
                 const hashedPssword = await bcrypt.hash(req.body.password, salt);
                 updateFields.password = hashedPssword;
             }
+
             const type = req.body.type;
+
             if (type === "admin") {
-                const User = await Admin.findByIdAndUpdate(tobeUpdated, {
+                const existingEmail = await Admin.findOne({ email: req.body.email });
+                if (existingEmail && existingEmail._id !== tobeUpdated) return res.status(403).json("email already exists");
+                const existingphone = await Admin.findOne({ phone: req.body.phone });
+                if (existingphone && existingphone._id !== tobeUpdated) return res.status(403).json("phone already exists");
+                await Admin.findByIdAndUpdate(tobeUpdated, {
                     $set: updateFields,
                 })
             } else {
-                const User = await Cashier.findByIdAndUpdate(tobeUpdated, {
+                const existingEmail = await Cashier.findOne({ email: req.body.email });
+                if (existingEmail && existingEmail._id !== tobeUpdated) return res.status(403).json("email already exists");
+                const existingphone = await Cashier.findOne({ phone: req.body.phone });
+                if (existingphone && existingphone._id !== tobeUpdated) return res.status(403).json("phone already exists");
+                Cashier.findByIdAndUpdate(tobeUpdated, {
                     $set: updateFields,
                 })
             }
