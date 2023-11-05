@@ -53,7 +53,7 @@ const updateItem = async (req, res) => {
         const tobeUpdated = req.params.id;
         const itemCode = req.body.initialItemcode;
         const exists = await Items.findOne({ itemCode: itemCode })
-        if (exists && exists._id !== tobeUpdated) return res.status(403).json("Item Code must be Unique!")
+        if (exists && exists._id !== tobeUpdated) return res.status(403).json("Item Code must be Uniqueeee!")
         try {
             await Items.findByIdAndUpdate(tobeUpdated, {
                 $set: req.body,
