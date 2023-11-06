@@ -63,7 +63,7 @@ const getAll = async (req, res) => {
         if (!currentUser) return res.status(403).json("only Cashier can access Pendings")
         if (!currentUser.isSubstore) return res.status(403).json("You are not allowed");
         try {
-            const Pendings = await ToShopPending.find({to:currentUser.warehouseName});
+            const Pendings = await ToShopPending.find();
             res.status(200).json(Pendings);
         } catch (err) {
             res.status(500).json("somthing went wrong!");

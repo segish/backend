@@ -12,6 +12,9 @@ const ShopRouter = require("./routes/Shops");
 const ToShopPendingRouter = require("./routes/ToShopPending");
 const sallsPendingRouter = require("./routes/SallesPending");
 const creditsRouter = require("./routes/Credits");
+const warehoseRouter = require("./routes/Warehouse");
+const HistoryRouter = require("./routes/History");
+const salleshistoryRouter = require("./routes/SallesHistory");
 const cookieParser = require("cookie-parser");
 
 dotenv.config();
@@ -45,6 +48,9 @@ app.use("/api/Shop", ShopRouter)
 app.use("/api/toshoppending", ToShopPendingRouter)
 app.use("/api/sallespending", sallsPendingRouter)
 app.use("/api/credits", creditsRouter)
+app.use("/api/warehouse", warehoseRouter)
+app.use("/api/history", HistoryRouter)
+app.use("/api/salleshistory", salleshistoryRouter)
 
 app.listen(8008, () => {
     console.log("Cashier backend server is running!");

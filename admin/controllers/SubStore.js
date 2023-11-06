@@ -105,6 +105,7 @@ const HoleSall = async (req, res) => {
                     paymentMethod: paymentMethod,
                     amount: amount,
                     sellType: "Hole",
+                    warehouseType: "subStore"
                 });
                 await newHistoryItem.save();
             }

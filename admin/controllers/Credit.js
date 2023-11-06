@@ -121,6 +121,7 @@ const ApproveCredit = async (req, res) => {
                 quantity: credit.quantity,
                 amount: credit.amount,
                 sellType: credit.sellType,
+                warehouseType: credit.warehouseType,
             });
             await newHistory.save();
             await Credits.findByIdAndDelete(toBeDeleted);

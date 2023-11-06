@@ -21,7 +21,7 @@ const transaction = async (req, res) => {
 
             const itemId = req.params.id;
             const quantity = parseInt(req.body.quantity);
-            const warehouseName = currentUser.warehouseName;
+            const warehouseName = req.body.warehouseName;
             const item = await SubStores.findById(itemId);
             if (!item) {
                 return res.status(404).json("Item not found");

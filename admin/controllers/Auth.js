@@ -267,7 +267,10 @@ const getAdmin = async (req, res) => {
 
         try {
             const user = await Admin.findById(userInfo.id);
-            if (!user) return res.status(403).json("No account found!");
+            if (!user) return res.clearCookie("adminAccessToken", {
+                // secure: true,
+                // sameSite: "none"
+            }).status(403).json("No account found!");
             const { password, updatedAt, ...others } = user._doc;
             res.status(200).json(others);
         } catch (err) {

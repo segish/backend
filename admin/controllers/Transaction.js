@@ -28,6 +28,7 @@ const Transaction = async (quantity, item, warehouseName) => {
         from: item.warehouseName,
         to: warehouseName,
         quantity: quantity,
+        warehouseType: "mainstore"
     });
     await newHistoryItem.save();
     return "saved!"

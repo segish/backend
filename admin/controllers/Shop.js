@@ -103,6 +103,7 @@ const transaction = async (req, res) => {
                     paymentMethod: paymentMethod,
                     sellType: "retail",
                     amount: amount,
+                    warehouseType: "shop"
                 });
                 await newHistoryItem.save();
             }

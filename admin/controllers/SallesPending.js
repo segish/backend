@@ -120,6 +120,7 @@ const ApprovePending = async (req, res) => {
                     quantity: pending.quantity,
                     amount: pending.amount,
                     sellType: pending.sellType,
+                    warehouseType: pending.warehouseType,
                 });
                 await newHistory.save();
             }

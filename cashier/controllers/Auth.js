@@ -149,7 +149,10 @@ const changePwd = async (req, res) => {
 //refresh user
 const getCashier = async (req, res) => {
     const token = req.cookies.accessToken;
-    if (!token) return res.status(401).json("You must login first!");
+    if (!token) return res.clearCookie("accessToken", {
+        // secure: true,
+        // sameSite: "none"
+    }) .status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
         if (err) return res.status(403).json("Token is not valid!");
