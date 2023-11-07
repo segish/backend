@@ -19,6 +19,7 @@ const HistoryRouter = require("./routes/History");
 const ToShopPendingRouter = require("./routes/ToShopPending");
 const SallesPendingRouter = require("./routes/SallesPending");
 const sallsHistoryRouter = require("./routes/SallesHistory");
+const expenseRouter = require("./routes/Expense");
 const cookieParser = require("cookie-parser");
 
 dotenv.config();
@@ -58,7 +59,8 @@ app.use("/api/credit", CreditRouter)
 app.use("/api/history", HistoryRouter)
 app.use("/api/salleshistory", sallsHistoryRouter)
 app.use("/api/toshoppending", ToShopPendingRouter)
-app.use("/api/sallespending", SallesPendingRouter)
+app.use("/api/sallespending", SallesPendingRouter);
+app.use("/api/expense", expenseRouter);
 
 app.listen(8000, () => {
     console.log("Admin backend server is running!");
