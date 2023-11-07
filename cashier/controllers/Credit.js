@@ -36,9 +36,9 @@ const approveCredit = async (req, res) => {
 
         const tobeUpdated = req.params.id;
         try {
-            await Cashier.findByIdAndUpdate(tobeUpdated, {
+            await Credits.findByIdAndUpdate(tobeUpdated, {
                 $set: { approvedByCashier: true },
-            })
+            });
             res.status(200).json("approved!!");
         } catch (err) {
             return res.status(500).json("somthing went wrong!")
