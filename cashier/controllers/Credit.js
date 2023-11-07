@@ -25,7 +25,7 @@ const getAll = async (req, res) => {
 
 //aproving by cashier
 const approveCredit = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
+    const token = req.cookies.accessToken;
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
