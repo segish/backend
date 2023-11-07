@@ -43,6 +43,10 @@ const CreditSchema = new mongoose.Schema({
     cheque: {
         type: String,
     },
+    approvedByCashier: {
+        type: Boolean,
+        default:false,
+    },
 },
     { timestamps: true },
 );

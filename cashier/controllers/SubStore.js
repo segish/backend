@@ -12,7 +12,7 @@ const transaction = async (req, res) => {
     if (!token) return res.status(401).json("You must log in first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         try {
             const currentUser = await Cashier.findById(userInfo.id);
@@ -60,7 +60,7 @@ const HoleSall = async (req, res) => {
     if (!token) return res.status(401).json("You must log in first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         try {
             const currentUser = await Cashier.findById(userInfo.id);
@@ -125,7 +125,7 @@ const getAll = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Cashier.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only Cashier can access SubStores")

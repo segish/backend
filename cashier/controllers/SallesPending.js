@@ -12,7 +12,7 @@ const deletePending = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Cashier.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only Cashier can delete Pendings!")
@@ -23,8 +23,8 @@ const deletePending = async (req, res) => {
             if (!pending) return res.status(401).json("item not found!");
             // if (pending.warehouseType === "subStore")
             if ((pending.warehouseType != "subStore" && currentUser.warehouseName != pending.from) ||
-             (pending.warehouseType === "subStore" && !currentUser.isSubstore))
-              return res.status(403).json("You are not allowed");
+                (pending.warehouseType === "subStore" && !currentUser.isSubstore))
+                return res.status(403).json("You are not allowed");
 
             if (pending.warehouseType === "subStore") {
                 const exists = await SubStores.findOne({
@@ -81,7 +81,7 @@ const getAll = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Cashier.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only Cashier can access Pendings")
@@ -95,7 +95,7 @@ const getAll = async (req, res) => {
                 });
                 const Pendings = Pending1.concat(Pending2)
                 res.status(200).json(Pendings);
-            }else{
+            } else {
                 const Pendings = await SallesPending.find({
                     from: currentUser.warehouseName,
                 });
