@@ -31,7 +31,7 @@ const approveCredit = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
         if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
-        const currentUser = await Admin.findById(userInfo.id);
+        const currentUser = await Cashier.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only cashier can approve credits")
 
         const tobeUpdated = req.params.id;
