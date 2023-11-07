@@ -14,7 +14,7 @@ const getAll = async (req, res) => {
         const currentUser = await Cashier.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only cashier can access Credits")
         try {
-            const shopCredit = await Credits.find({ warehouseName: currentUser.warehouseName });
+            const shopCredit = await Credits.find({ warehouseName: currentUser.warehouseName,approvedByCashier:false });
             const substoreCredit = currentUser.isSubstore ? await Credits.find({ warehouseType: "subStore" }) : [];
             res.status(200).json(shopCredit.concat(substoreCredit));
         } catch (err) {
