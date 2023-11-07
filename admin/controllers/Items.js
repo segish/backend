@@ -19,7 +19,7 @@ const addItem = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         try {
             const currentUser = await Admin.findById(userInfo.id);
@@ -45,7 +45,7 @@ const updateItem = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can update items")
@@ -94,7 +94,7 @@ const deleteItem = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can delete items!")
@@ -130,7 +130,7 @@ const getAll = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can access items")

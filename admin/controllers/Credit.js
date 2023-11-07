@@ -14,7 +14,7 @@ const canceleCredite = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only Admin can delete Pendings!")
@@ -100,7 +100,7 @@ const ApproveCredit = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only Admin can Approve Pendings")
@@ -133,52 +133,13 @@ const ApproveCredit = async (req, res) => {
     })
 }
 
-//add Credit
-
-// const addCredit = async (req, res) => {
-
-//     const token = req.cookies.adminAccessToken;
-//     if (!token) return res.status(401).json("You must login first!!");
-
-//     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-//         if (err) return res.status(403).json("Token is not valid!");
-
-//         try {
-//             const currentUser = await Admin.findById(userInfo.id);
-//             if (!currentUser) return res.status(403).json("only admin can add Credits")
-//             if (currentUser.type != "admin") return res.status(403).json("only admin can add Credits")
-//             const { customerName, itemCode, phone, warehouseName, paymentDate,
-//                 quantity, name, specification, type, expireDate, } = req.body
-//             const amount = parseFloat(req.body.amount) * quantity
-//             const newItme = new Credits({
-//                 customerName: customerName,
-//                 name: name,
-//                 specification: specification,
-//                 type: type,
-//                 expireDate: expireDate,
-//                 cheque: cheque,
-//                 amount: amount,
-//                 itemCode: itemCode,
-//                 phone: phone,
-//                 warehouseName: warehouseName,
-//                 paymentDate: paymentDate,
-//             });
-//             //save and respond 
-//             const Credit = await newItme.save();
-//             res.status(200).json(Credit);
-//         } catch (err) {
-//             res.status(500).json("somthing went wrong!")
-//         }
-//     })
-// }
-
 //updat Credit
 const updateCredit = async (req, res) => {
     const token = req.cookies.adminAccessToken;
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can update Credits")
@@ -200,7 +161,7 @@ const deleteCredit = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can delete Credits!")
@@ -220,7 +181,7 @@ const getAll = async (req, res) => {
     if (!token) return res.status(401).json("You must login first!");
 
     jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Token is not valid!");
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
 
         const currentUser = await Admin.findById(userInfo.id);
         if (!currentUser) return res.status(403).json("only admin can access Credits")
@@ -233,4 +194,4 @@ const getAll = async (req, res) => {
         }
     })
 }
-module.exports = { canceleCredite, deleteCredit, getAll, updateCredit,ApproveCredit };
+module.exports = { canceleCredite, deleteCredit, getAll, updateCredit, ApproveCredit };
