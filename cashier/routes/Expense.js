@@ -1,12 +1,9 @@
 const router = require("express").Router();
-const {
-  getAll,
-  makeExpense,
-  expenseHistory,
-} = require("../controllers/Expense.js");
+const { getAll, makeExpense, expenseHistory, totalSaleAndExpense } = require("../controllers/Expense.js");
 
 router.get("/getall", getAll);
 router.get("/getexpensehistory", expenseHistory);
+router.get("/total", totalSaleAndExpense);
 router.post("/newexpense", makeExpense);
 
 module.exports = router;

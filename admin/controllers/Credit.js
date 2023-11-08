@@ -110,20 +110,26 @@ const ApproveCredit = async (req, res) => {
 
             const credit = await Credits.findById(toBeDeleted);
 
-            const newHistory = new SellsHistory({
-                name: credit.name,
-                itemCode: credit.itemCode,
-                specification: credit.specification,
-                type: credit.type,
-                from: credit.warehouseName,
-                to: credit.customerName,
-                paymentMethod: "credit/paid",
-                quantity: credit.quantity,
-                amount: credit.amount,
-                sellType: credit.sellType,
-                warehouseType: credit.warehouseType,
-            });
-            await newHistory.save();
+            if (credit.creditType === "half") {
+                const initialHistory = await SellsHistory.findById(toBeDeleted)
+                initialHistory.amount = (parseInt(initialHistory.amount) || 0) + parseInt(credit.amount);
+                await initialHistory.save();
+            } else {
+                const newHistory = new SellsHistory({
+                    name: credit.name,
+                    itemCode: credit.itemCode,
+                    specification: credit.specification,
+                    type: credit.type,
+                    from: credit.warehouseName,
+                    to: credit.customerName,
+                    paymentMethod: "credit/paid",
+                    quantity: credit.quantity,
+                    amount: credit.amount,
+                    sellType: credit.sellType,
+                    warehouseType: credit.warehouseType,
+                });
+                await newHistory.save();
+            }
             await Credits.findByIdAndDelete(toBeDeleted);
             res.status(200).json("Pending has been approved");
 
