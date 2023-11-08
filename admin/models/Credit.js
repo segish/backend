@@ -43,6 +43,10 @@ const CreditSchema = new mongoose.Schema({
     cheque: {
         type: String,
     },
+    creditType: {
+        type: String,
+        default: "full",
+    },
     approvedByCashier: {
         type: Boolean,
         default: false,

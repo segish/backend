@@ -28,6 +28,9 @@ const SallesPendingSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
     },
+    halfPayMethod: {
+        type: String,
+    },
     from: {
         type: String,
     },
@@ -35,6 +38,9 @@ const SallesPendingSchema = new mongoose.Schema({
         type: String,
     },
     amount: {
+        type: Number,
+    },
+    paidamount: {
         type: Number,
     },
     paymentDate: {
@@ -45,6 +51,10 @@ const SallesPendingSchema = new mongoose.Schema({
     },
     sellType: {
         type: String,
+    },
+    creditType: {
+        type: String,
+        default: "full",
     },
     cheque: {
         type: String,

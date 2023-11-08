@@ -90,7 +90,43 @@ const ApprovePending = async (req, res) => {
 
             const pending = await SallesPending.findById(toBeDeleted);
             if (!pending) res.status(404).json("pending not found!")
-            if (pending.paymentMethod === "credit") {
+            if (pending.paymentMethod === "halfpaid") {
+
+                const newCredit = new Credits({
+                    name: pending.name,
+                    itemCode: pending.itemCode,
+                    specification: pending.specification,
+                    type: pending.type,
+                    expireDate: pending.expireDate,
+                    quantity: pending.quantity,
+                    warehouseType: pending.warehouseType,
+                    sellType: pending.sellType,
+                    customerName: pending.to,
+                    amount: pending.amount - pending.paidamount,
+                    phone: pending.phone,
+                    warehouseName: pending.from,
+                    paymentDate: pending.paymentDate,
+                    cheque: pending.cheque,
+                    creditType: "half"
+                });
+                const savedCredit = await newCredit.save();
+
+                const newHistory = new SellsHistory({
+                    _id: savedCredit._id,
+                    name: pending.name,
+                    itemCode: pending.itemCode,
+                    specification: pending.specification,
+                    type: pending.type,
+                    from: pending.from,
+                    to: pending.to,
+                    paymentMethod: pending.halfPayMethod,
+                    quantity: pending.quantity,
+                    amount: pending.paidamount,
+                    sellType: pending.sellType,
+                    warehouseType: pending.warehouseType,
+                });
+                await newHistory.save();
+            } else if (pending.paymentMethod === "credit") {
                 const newCredit = new Credits({
                     name: pending.name,
                     itemCode: pending.itemCode,

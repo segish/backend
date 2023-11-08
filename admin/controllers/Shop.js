@@ -68,7 +68,50 @@ const transaction = async (req, res) => {
             if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
 
 
-            if (paymentMethod === "credit") {
+            if (paymentMethod === "halfpaid") {
+
+                const phone = req.body.phone;
+                const paymentDate = req.body.paymentDate;
+                const cheque = req.body.cheque;
+                const paidamount = parseFloat(req.body.paidamount);
+                const halfPayMethod = req.body.halfPayMethod;
+
+                const newCcredit = new Credits({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    expireDate: item.expireDate,
+                    quantity: quantity,
+                    warehouseType: "shop",
+                    sellType: "retail",
+                    customerName: customerName,
+                    amount: amount - paidamount,
+                    phone: phone,
+                    warehouseName: item.warehouseName,
+                    paymentDate: paymentDate,
+                    cheque: cheque || "____",
+                    creditType: "half"
+                });
+                const savedCredit = await newCcredit.save();
+
+                const newHistoryItem = new SellsHistory({
+                    _id: savedCredit._id,
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    from: item.warehouseName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: halfPayMethod,
+                    amount: paidamount,
+                    sellType: "retail",
+                    warehouseType: "shop"
+                });
+                await newHistoryItem.save();
+
+            } else if (paymentMethod === "credit") {
 
                 const phone = req.body.phone;
                 const paymentDate = req.body.paymentDate;
