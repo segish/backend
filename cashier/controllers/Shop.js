@@ -33,26 +33,57 @@ const transaction = async (req, res) => {
             const currentQuantity = parseInt(item.quantity) || 0;
             if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
 
-            const newpendingItem = new SallesPending({
-                name: item.name,
-                itemCode: item.itemCode,
-                specification: item.specification,
-                type: item.type,
-                expireDate: item.expireDate,
-                from: item.warehouseName,
-                cashierName: currentUser.adminName,
-                to: customerName,
-                quantity: quantity,
-                paymentMethod: paymentMethod,
-                warehouseType: "shop",
-                amount: amount,
-                paymentDate: paymentDate,
-                phone: phone,
-                cheque: cheque || "____",
-                sellType: "retail",
-            });
-            await newpendingItem.save();
+            if (paymentMethod === "halfpaid") {
 
+                const phone = req.body.phone;
+                const paymentDate = req.body.paymentDate;
+                const cheque = req.body.cheque;
+                const paidamount = parseFloat(req.body.paidamount);
+                const halfPayMethod = req.body.halfPayMethod;
+
+                const newpendingItem = new SallesPending({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    expireDate: item.expireDate,
+                    from: item.warehouseName,
+                    to: customerName,
+                    cashierName: currentUser.adminName,
+                    quantity: quantity,
+                    paymentMethod: paymentMethod,
+                    halfPayMethod: halfPayMethod,
+                    warehouseType: "shop",
+                    amount: amount,
+                    paidamount: paidamount,
+                    paymentDate: paymentDate,
+                    phone: phone,
+                    cheque: cheque || "____",
+                    sellType: "retail",
+                });
+                await newpendingItem.save();
+
+            } else {
+                const newpendingItem = new SallesPending({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    expireDate: item.expireDate,
+                    from: item.warehouseName,
+                    cashierName: currentUser.adminName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: paymentMethod,
+                    warehouseType: "shop",
+                    amount: amount,
+                    paymentDate: paymentDate,
+                    phone: phone,
+                    cheque: cheque || "____",
+                    sellType: "retail",
+                });
+                await newpendingItem.save();
+            }
             if (quantity === currentQuantity) {
                 await Shops.findByIdAndDelete(itemId);
                 res.status(200).json("Item has moved to pending waitin to be approved by admin");
