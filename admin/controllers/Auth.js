@@ -230,7 +230,7 @@ const updateUser = async (req, res) => {
             }
 
             const type = req.body.type;
-
+            
             if (type === "admin") {
                 const existingEmail = await Admin.findOne({ email: req.body.email });
                 if (existingEmail && existingEmail._id.toString() !== tobeUpdated) return res.status(403).json("email already exists");
@@ -244,7 +244,7 @@ const updateUser = async (req, res) => {
                 if (existingEmail && existingEmail._id.toString() !== tobeUpdated) return res.status(403).json("email already exists");
                 const existingphone = await Cashier.findOne({ phone: req.body.phone });
                 if (existingphone && existingphone._id.toString() !== tobeUpdated) return res.status(403).json("phone already exists");
-                Cashier.findByIdAndUpdate(tobeUpdated, {
+                await Cashier.findByIdAndUpdate(tobeUpdated, {
                     $set: updateFields,
                 })
             }

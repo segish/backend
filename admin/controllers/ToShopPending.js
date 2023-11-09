@@ -78,7 +78,8 @@ const approvePending = async (req, res) => {
                 || quantity > (currentQuantity - pendingSaleQuantity)
                 || pendingToshopQuantity > (currentQuantity - pendingSaleQuantity )) return res.status(500).json("somthing went wrong!");
 
-            if (pendingSaleQuantity === 0 && quantity === pendingToshopQuantity === currentQuantity) {
+            if (pendingSaleQuantity === 0 && quantity === pendingToshopQuantity 
+                && pendingToshopQuantity === currentQuantity && currentQuantity==quantity) {
                 await SubStores.findOneAndDelete({
                     itemCode: pending.itemCode,
                     warehouseName: pending.from
