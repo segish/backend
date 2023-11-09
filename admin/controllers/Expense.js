@@ -74,4 +74,139 @@ const approveExpenses = async (req, res) => {
     }
   });
 };
-module.exports = { getAll, approveExpenses, expenseHistory };
+
+const totalSaleAndExpense = async (req, res) => {
+  const token = req.cookies.adminAccessToken;
+  if (!token) return res.status(401).json("You must login first!");
+
+  jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
+    if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
+    try {
+      const currentUser = await Cashier.findById(userInfo.id);
+      if (!currentUser) return res.status(403).json("only cashier can access expenses");
+
+      const { cashierName, warehouseName } = req.body;
+      const today = new Date(); // Get the current date
+      const pipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            cashierName: cashierName,
+            paymentMethod: "cash",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+      const halfpipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            cashierName: cashierName,
+            paymentMethod: "halfpaid",
+            halfPayMethod: "cash",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$paidamount" },
+          },
+        },
+      ];
+
+      const creditPipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            cashierName: cashierName,
+            paymentMethod: "credit",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+      const transferPipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            cashierName: cashierName,
+            paymentMethod: { $regex: "transfer" }, 
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+
+      const expensePipeline = [
+        {
+          $match: {
+            cashierName: cashierName,
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+
+      const cashResult = await SallesPending.aggregate(pipeline);
+      const creditResult = await SallesPending.aggregate(creditPipeline);
+      const transferTesult = await SallesPending.aggregate(transferPipeline);
+      const resultPartial = await SallesPending.aggregate(halfpipeline);
+      const expenseResult = await Expense.aggregate(expensePipeline);
+
+      const totalSaleCash = cashResult.length > 0 ? cashResult[0].totalAmount : 0;
+      const totalSaleCredit = creditResult.length > 0 ? creditResult[0].totalAmount : 0;
+      const totalSaleTransfer = transferTesult.length > 0 ? transferTesult[0].totalAmount : 0;
+      const totalPartialSale = resultPartial.length > 0 ? resultPartial[0].totalAmount : 0;
+      const totalExpense = expenseResult.length > 0 ? expenseResult[0].totalAmount : 0;
+
+      const totalResponse = {
+        totalSale: totalSaleCash + totalPartialSale,
+        totalSaleCredit: totalSaleCredit,
+        totalSaleTransfer: totalSaleTransfer,
+        totalExpense: totalExpense,
+      }
+      res.status(200).json(totalResponse)
+
+    } catch (err) {
+      res.status(500).json("somthing went wrong!");
+    }
+  });
+};
+module.exports = { getAll, approveExpenses, expenseHistory, totalSaleAndExpense };

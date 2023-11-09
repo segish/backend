@@ -73,6 +73,7 @@ const totalSaleAndExpense = async (req, res) => {
           $match: {
             from: currentUser.warehouseName,
             cashierName: currentUser.adminName,
+            paymentMethod: "cash",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
@@ -83,6 +84,26 @@ const totalSaleAndExpense = async (req, res) => {
           $group: {
             _id: null,
             totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+      const halfpipeline = [
+        {
+          $match: {
+            from: currentUser.warehouseName,
+            cashierName: currentUser.adminName,
+            paymentMethod: "halfpaid",
+            halfPayMethod:"cash",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$paidamount" },
           },
         },
       ];
@@ -106,17 +127,15 @@ const totalSaleAndExpense = async (req, res) => {
       ];
 
       const result = await SallesPending.aggregate(pipeline);
+      const resultPartial = await SallesPending.aggregate(halfpipeline);
       const expenseResult = await Expense.aggregate(expensePipeline);
-      var totalSale = 0
-      var totalExpense = 0
-      if (result.length > 0) {
-        totalSale = result[0].totalAmount
-      }
-      if (expenseResult.length > 0) {
-        totalExpense = expenseResult[0].totalAmount
-      }
+
+      const totalSale = result.length > 0 ? result[0].totalAmount : 0;
+      const totalPartialSale = resultPartial.length > 0 ? resultPartial[0].totalAmount : 0;
+      const totalExpense = expenseResult.length > 0 ? expenseResult[0].totalAmount : 0;
+      
       const totalResponse = {
-        totalSale: totalSale,
+        totalSale: totalSale + totalPartialSale,
         totalExpense: totalExpense,
       }
       res.status(200).json(totalResponse)
@@ -163,6 +182,26 @@ const makeExpense = async (req, res) => {
           },
         },
       ];
+      const halfpipeline = [
+        {
+          $match: {
+            from: currentUser.warehouseName,
+            cashierName: currentUser.adminName,
+            paymentMethod: "halfpaid",
+            halfPayMethod: "cash",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$paidamount" },
+          },
+        },
+      ];
 
       const expensePipeline = [
         {
@@ -183,12 +222,15 @@ const makeExpense = async (req, res) => {
       ];
 
       const result = await SallesPending.aggregate(pipeline);
+      const resultPartial = await SallesPending.aggregate(halfpipeline);
       const expenseResult = await Expense.aggregate(expensePipeline);
+      const totalSale = result.length > 0 ? result[0].totalAmount : 0;
+      const totalPartialSale = resultPartial.length > 0 ? resultPartial[0].totalAmount : 0;
       const totalExpenseAmount = expenseResult.length > 0 ? expenseResult[0].totalAmount : 0;
 
-      if (result.length === 0)
+      if (result.length === 0 && resultPartial.length === 0)
         return res.status(403).json("you dont have any sales today to make expenses");
-      if (result.length > 0 && (result[0].totalAmount - totalExpenseAmount) < amount)
+      if ((totalSale + totalPartialSale - totalExpenseAmount) < amount)
         return res.status(403).json("you dont have enough sales today to make this expense");
 
       const newExpense = new Expense({
