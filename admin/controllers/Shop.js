@@ -125,7 +125,7 @@ const transaction = async (req, res) => {
                 res.status(200).json("Item has soled");
             }
         } catch (err) {
-            res.status(500).json("Something went wrong!");
+            res.status(500).json("Something went wrong!"+err);
         }
     });
 };
