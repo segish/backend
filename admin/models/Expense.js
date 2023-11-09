@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const ExpenseSchema = new mongoose.Schema(
   {
@@ -10,6 +10,10 @@ const ExpenseSchema = new mongoose.Schema(
     },
     amount: {
       type: Number,
+    },
+    approved: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
