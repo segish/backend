@@ -42,6 +42,7 @@ const addSubStore = async (req, res) => {
 }
 
 
+
 //Hole sale
 const HoleSall = async (req, res) => {
     const token = req.cookies.adminAccessToken;
@@ -60,7 +61,6 @@ const HoleSall = async (req, res) => {
             const customerName = req.body.customerName;
             const paymentMethod = req.body.paymentMethod;
             const amount = parseFloat(req.body.amount) * quantity;
-
             const item = await SubStores.findById(itemId);
 
             if (!item) {
@@ -69,7 +69,6 @@ const HoleSall = async (req, res) => {
 
             const currentQuantity = parseInt(item.quantity) || 0;
             if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
-
             if (paymentMethod === "halfpaid") {
 
                 const phone = req.body.phone;
@@ -78,7 +77,23 @@ const HoleSall = async (req, res) => {
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
 
+                const newHistoryItem = new SellsHistory({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    from: item.warehouseName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: halfPayMethod,
+                    amount: paidamount,
+                    sellType: "Hole",
+                    warehouseType: "subStore"
+                });
+                const savedHistory = await newHistoryItem.save();
+
                 const newCcredit = new Credits({
+                    _id: savedHistory._id,
                     name: item.name,
                     itemCode: item.itemCode,
                     specification: item.specification,
@@ -95,23 +110,7 @@ const HoleSall = async (req, res) => {
                     cheque: cheque || "____",
                     creditType: "half"
                 });
-                const savedCredit = await newCcredit.save();
-
-                const newHistoryItem = new SellsHistory({
-                    _id: savedCredit._id,
-                    name: item.name,
-                    itemCode: item.itemCode,
-                    specification: item.specification,
-                    type: item.type,
-                    from: item.warehouseName,
-                    to: customerName,
-                    quantity: quantity,
-                    paymentMethod: halfPayMethod,
-                    amount: paidamount,
-                    sellType: "Hole",
-                    warehouseType: "subStore"
-                });
-                await newHistoryItem.save();
+                await newCcredit.save();
 
             } else if (paymentMethod === "credit") {
 

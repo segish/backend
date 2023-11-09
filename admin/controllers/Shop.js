@@ -75,8 +75,23 @@ const transaction = async (req, res) => {
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
+                const newHistoryItem = new SellsHistory({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    from: item.warehouseName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: halfPayMethod,
+                    amount: paidamount,
+                    sellType: "retail",
+                    warehouseType: "shop"
+                });
+                const savedHistory =  await newHistoryItem.save();
 
                 const newCcredit = new Credits({
+                    _id: savedHistory._id,
                     name: item.name,
                     itemCode: item.itemCode,
                     specification: item.specification,
@@ -93,23 +108,8 @@ const transaction = async (req, res) => {
                     cheque: cheque || "____",
                     creditType: "half"
                 });
-                const savedCredit = await newCcredit.save();
+                await newCcredit.save();
 
-                const newHistoryItem = new SellsHistory({
-                    _id: savedCredit._id,
-                    name: item.name,
-                    itemCode: item.itemCode,
-                    specification: item.specification,
-                    type: item.type,
-                    from: item.warehouseName,
-                    to: customerName,
-                    quantity: quantity,
-                    paymentMethod: halfPayMethod,
-                    amount: paidamount,
-                    sellType: "retail",
-                    warehouseType: "shop"
-                });
-                await newHistoryItem.save();
 
             } else if (paymentMethod === "credit") {
 

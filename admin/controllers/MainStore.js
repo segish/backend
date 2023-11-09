@@ -77,7 +77,23 @@ const HoleSall = async (req, res) => {
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
 
+                const newHistoryItem = new SellsHistory({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    from: item.warehouseName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: halfPayMethod,
+                    amount: paidamount,
+                    sellType: "Hole",
+                    warehouseType: "mainstore"
+                });
+                const savedHistory = await newHistoryItem.save();
+
                 const newCcredit = new Credits({
+                    _id: savedHistory._id,
                     name: item.name,
                     itemCode: item.itemCode,
                     specification: item.specification,
@@ -94,23 +110,8 @@ const HoleSall = async (req, res) => {
                     cheque: cheque || "____",
                     creditType: "half"
                 });
-                const savedCredit = await newCcredit.save();
+                await newCcredit.save();
 
-                const newHistoryItem = new SellsHistory({
-                    _id: savedCredit._id,
-                    name: item.name,
-                    itemCode: item.itemCode,
-                    specification: item.specification,
-                    type: item.type,
-                    from: item.warehouseName,
-                    to: customerName,
-                    quantity: quantity,
-                    paymentMethod: halfPayMethod,
-                    amount: paidamount,
-                    sellType: "Hole",
-                    warehouseType: "mainstore"
-                });
-                await newHistoryItem.save();
 
             } else if (paymentMethod === "credit") {
 

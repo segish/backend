@@ -92,7 +92,23 @@ const ApprovePending = async (req, res) => {
             if (!pending) res.status(404).json("pending not found!")
             if (pending.paymentMethod === "halfpaid") {
 
+                const newHistory = new SellsHistory({
+                    name: pending.name,
+                    itemCode: pending.itemCode,
+                    specification: pending.specification,
+                    type: pending.type,
+                    from: pending.from,
+                    to: pending.to,
+                    paymentMethod: pending.halfPayMethod,
+                    quantity: pending.quantity,
+                    amount: pending.paidamount,
+                    sellType: pending.sellType,
+                    warehouseType: pending.warehouseType,
+                });
+                const savedHistory = await newHistory.save();
+
                 const newCredit = new Credits({
+                    _id: savedHistory._id,
                     name: pending.name,
                     itemCode: pending.itemCode,
                     specification: pending.specification,
@@ -111,21 +127,6 @@ const ApprovePending = async (req, res) => {
                 });
                 const savedCredit = await newCredit.save();
 
-                const newHistory = new SellsHistory({
-                    _id: savedCredit._id,
-                    name: pending.name,
-                    itemCode: pending.itemCode,
-                    specification: pending.specification,
-                    type: pending.type,
-                    from: pending.from,
-                    to: pending.to,
-                    paymentMethod: pending.halfPayMethod,
-                    quantity: pending.quantity,
-                    amount: pending.paidamount,
-                    sellType: pending.sellType,
-                    warehouseType: pending.warehouseType,
-                });
-                await newHistory.save();
             } else if (pending.paymentMethod === "credit") {
                 const newCredit = new Credits({
                     name: pending.name,
