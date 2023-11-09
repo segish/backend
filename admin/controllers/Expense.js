@@ -91,7 +91,6 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: warehouseName,
-            cashierName: cashierName,
             paymentMethod: "cash",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -110,7 +109,6 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: warehouseName,
-            cashierName: cashierName,
             paymentMethod: "halfpaid",
             halfPayMethod: "cash",
             createdAt: {
@@ -131,7 +129,6 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: warehouseName,
-            cashierName: cashierName,
             paymentMethod: "credit",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -150,7 +147,6 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: warehouseName,
-            cashierName: cashierName,
             paymentMethod: { $regex: "transfer" }, 
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -169,7 +165,6 @@ const totalSaleAndExpense = async (req, res) => {
       const expensePipeline = [
         {
           $match: {
-            cashierName: cashierName,
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
