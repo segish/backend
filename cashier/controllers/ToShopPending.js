@@ -27,7 +27,7 @@ const deletePending = async (req, res) => {
             });
 
             if (exists) {
-                exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                exists.pendingToshopQuantity = (parseInt(exists.pendingToshopQuantity) || 0) - parseInt(pending.quantity);
                 await exists.save();
                 await ToShopPending.findByIdAndDelete(toBeDeleted);
                 res.status(200).json("Pending has been deleted");
@@ -37,7 +37,6 @@ const deletePending = async (req, res) => {
                     itemCode: pending.itemCode,
                     specification: pending.specification,
                     type: pending.type,
-                    expireDate: pending.expireDate,
                     warehouseName: pending.from,
                     quantity: pending.quantity,
                 });

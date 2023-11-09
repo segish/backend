@@ -5,39 +5,6 @@ const Credits = require("../models/Credit")
 const Admin = require("../models/Admin")
 const dotenv = require("dotenv");
 dotenv.config();
-//add Shop
-
-const addShop = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must log in first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        try {
-            const currentUser = await Admin.findById(userInfo.id);
-            if (!currentUser) return res.status(403).json("Only admin can add Shops");
-            if (currentUser.type !== "admin") return res.status(403).json("Only admin can add Shops");
-
-            const { itemCode, quantity, ...otherFields } = req.body;
-
-            const existingItem = await Shops.findOne({ itemCode });
-
-            if (existingItem) {
-                existingItem.quantity = (parseInt(existingItem.quantity) || 0) + parseInt(quantity);
-                await existingItem.save();
-                res.status(200).json(existingItem);
-            } else {
-                const newItem = new Shops(req.body);
-
-                const savedItem = await newItem.save();
-                res.status(200).json(savedItem);
-            }
-        } catch (err) {
-            res.status(500).json("Something went wrong!");
-        }
-    });
-}
 
 //transaction
 const transaction = async (req, res) => {
@@ -65,7 +32,8 @@ const transaction = async (req, res) => {
             }
 
             const currentQuantity = parseInt(item.quantity) || 0;
-            if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity-pendingSaleQuantity)) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
 
 
             if (paymentMethod === "halfpaid") {
@@ -88,7 +56,7 @@ const transaction = async (req, res) => {
                     sellType: "retail",
                     warehouseType: "shop"
                 });
-                const savedHistory =  await newHistoryItem.save();
+                const savedHistory = await newHistoryItem.save();
 
                 const newCcredit = new Credits({
                     _id: savedHistory._id,
@@ -96,7 +64,6 @@ const transaction = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "shop",
                     sellType: "retail",
@@ -122,7 +89,6 @@ const transaction = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "shop",
                     sellType: "retail",
@@ -150,7 +116,7 @@ const transaction = async (req, res) => {
                 });
                 await newHistoryItem.save();
             }
-            if (quantity === currentQuantity) {
+            if (quantity === currentQuantity && pendingSaleQuantity === 0) {
                 await Shops.findByIdAndDelete(itemId);
                 res.status(200).json("Item has soled");
             } else if (quantity < currentQuantity) {
@@ -163,48 +129,6 @@ const transaction = async (req, res) => {
         }
     });
 };
-
-//updat Shop
-const updateShop = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can update Shops")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can update Shops!")
-        const tobeUpdated = req.params.id;
-        try {
-            const Shop = await Shops.findByIdAndUpdate(tobeUpdated, {
-                $set: req.body,
-            })
-            res.status(200).json("updated");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!")
-        }
-    })
-}
-
-const deleteShop = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can delete Shops!")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can delete Shops!")
-        try {
-            await Shops.findByIdAndDelete(req.params.id);
-            res.status(200).json("Shop has been deleted");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!");
-        }
-    });
-}
 
 //get all Shops
 const getAll = async (req, res) => {
@@ -225,4 +149,4 @@ const getAll = async (req, res) => {
         }
     })
 }
-module.exports = { addShop, deleteShop, getAll, updateShop, transaction };
+module.exports = { getAll, transaction };

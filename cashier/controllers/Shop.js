@@ -31,7 +31,8 @@ const transaction = async (req, res) => {
             if (currentUser.warehouseName != item.warehouseName) return res.status(403).json("You are not allowed");
 
             const currentQuantity = parseInt(item.quantity) || 0;
-            if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity - pendingSaleQuantity)) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
 
             if (paymentMethod === "halfpaid") {
 
@@ -46,7 +47,6 @@ const transaction = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     from: item.warehouseName,
                     to: customerName,
                     cashierName: currentUser.adminName,
@@ -69,7 +69,6 @@ const transaction = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     from: item.warehouseName,
                     cashierName: currentUser.adminName,
                     to: customerName,
@@ -84,14 +83,19 @@ const transaction = async (req, res) => {
                 });
                 await newpendingItem.save();
             }
-            if (quantity === currentQuantity) {
-                await Shops.findByIdAndDelete(itemId);
-                res.status(200).json("Item has moved to pending waitin to be approved by admin");
-            } else if (quantity < currentQuantity) {
-                item.quantity = currentQuantity - quantity;
-                await item.save();
-                res.status(200).json("Item has moved to pending waitin to be approved by admin");
-            }
+
+            item.pendingSaleQuantity = pendingSaleQuantity + quantity;
+            await item.save();
+            res.status(200).json("Item has moved to pending waiting to be approved by admin");
+
+            // if (quantity === currentQuantity) {
+            //     await Shops.findByIdAndDelete(itemId);
+            //     res.status(200).json("Item has moved to pending waitin to be approved by admin");
+            // } else if (quantity < currentQuantity) {
+            //     item.quantity = currentQuantity - quantity;
+            //     await item.save();
+            //     res.status(200).json("Item has moved to pending waitin to be approved by admin");
+            // }
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }

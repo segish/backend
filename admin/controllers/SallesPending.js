@@ -31,7 +31,7 @@ const deletePending = async (req, res) => {
                     warehouseName: pending.from
                 });
                 if (exists) {
-                    exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - parseInt(pending.quantity);
                     await exists.save();
                 } else {
                     const newItem = new SubStores({
@@ -39,7 +39,6 @@ const deletePending = async (req, res) => {
                         itemCode: pending.itemCode,
                         specification: pending.specification,
                         type: pending.type,
-                        expireDate: pending.expireDate,
                         warehouseName: pending.from,
                         quantity: pending.quantity,
                     });
@@ -51,7 +50,7 @@ const deletePending = async (req, res) => {
                     warehouseName: pending.from
                 });
                 if (exists) {
-                    exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - parseInt(pending.quantity);
                     await exists.save();
                 } else {
                     const newItem = new Shops({
@@ -59,7 +58,6 @@ const deletePending = async (req, res) => {
                         itemCode: pending.itemCode,
                         specification: pending.specification,
                         type: pending.type,
-                        expireDate: pending.expireDate,
                         warehouseName: pending.from,
                         quantity: pending.quantity,
                     });
@@ -113,7 +111,6 @@ const ApprovePending = async (req, res) => {
                     itemCode: pending.itemCode,
                     specification: pending.specification,
                     type: pending.type,
-                    expireDate: pending.expireDate,
                     quantity: pending.quantity,
                     warehouseType: pending.warehouseType,
                     sellType: pending.sellType,
@@ -125,7 +122,7 @@ const ApprovePending = async (req, res) => {
                     cheque: pending.cheque,
                     creditType: "half"
                 });
-                const savedCredit = await newCredit.save();
+                await newCredit.save();
 
             } else if (pending.paymentMethod === "credit") {
                 const newCredit = new Credits({
@@ -133,7 +130,6 @@ const ApprovePending = async (req, res) => {
                     itemCode: pending.itemCode,
                     specification: pending.specification,
                     type: pending.type,
-                    expireDate: pending.expireDate,
                     quantity: pending.quantity,
                     warehouseType: pending.warehouseType,
                     sellType: pending.sellType,
@@ -161,6 +157,59 @@ const ApprovePending = async (req, res) => {
                 });
                 await newHistory.save();
             }
+
+            if (pending.warehouseType === "subStore") {
+                const exists = await SubStores.findOne({
+                    itemCode: pending.itemCode,
+                    warehouseName: pending.from
+                });
+                if (!exists) return res.status(500).json("somthing went wrong!");
+                const quantity = parseInt(pending.quantity) || 0;
+                const currentQuantity = parseInt(exists.quantity) || 0;
+                const pendingToshopQuantity = parseInt(exists.pendingToshopQuantity) || 0;
+                const pendingSaleQuantity = parseInt(exists.pendingSaleQuantity) || 0;
+                if (quantity > pendingSaleQuantity
+                    || quantity > (currentQuantity - pendingToshopQuantity)
+                    || pendingSaleQuantity > (currentQuantity - pendingToshopQuantity)) return res.status(500).json("somthing went wrong!");
+
+                if (pendingToshopQuantity === 0 && quantity === pendingSaleQuantity === currentQuantity) {
+                    await SubStores.findOneAndDelete({
+                        itemCode: pending.itemCode,
+                        warehouseName: pending.from
+                    });
+                } else {
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - quantity;
+                    exists.quantity = (parseInt(exists.quantity) || 0) - quantity;
+                    exists.save();
+                }
+
+            } else {
+                const exists = await Shops.findOne({
+                    itemCode: pending.itemCode,
+                    warehouseName: pending.from
+                });
+
+                if (!exists) return res.status(500).json("somthing went wrong!");
+                const quantity = parseInt(pending.quantity) || 0;
+                const currentQuantity = parseInt(exists.quantity) || 0;
+                const pendingSaleQuantity = parseInt(exists.pendingSaleQuantity) || 0;
+
+                if (quantity > pendingSaleQuantity
+                    || quantity > currentQuantity
+                    || pendingSaleQuantity > currentQuantity) return res.status(500).json("somthing went wrong!");
+
+                if (quantity === pendingSaleQuantity === currentQuantity) {
+                    await SubStores.findOneAndDelete({
+                        itemCode: pending.itemCode,
+                        warehouseName: pending.from
+                    });
+                } else {
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - quantity;
+                    exists.quantity = (parseInt(exists.quantity) || 0) - quantity;
+                    exists.save();
+                }
+            }
+
             await SallesPending.findByIdAndDelete(toBeDeleted);
             res.status(200).json("Pending has been approved");
 

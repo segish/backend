@@ -9,39 +9,6 @@ const Admin = require("../models/Admin")
 const dotenv = require("dotenv");
 dotenv.config();
 
-//add MainStore
-
-const addMainStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must log in first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        try {
-            const currentUser = await Admin.findById(userInfo.id);
-            if (!currentUser) return res.status(403).json("Only admin can add MainStores");
-            if (currentUser.type !== "admin") return res.status(403).json("Only admin can add MainStores");
-
-            const { itemCode, quantity, warehouseName, ...otherFields } = req.body;
-
-            const existingItem = await MainStores.findOne({ itemCode, warehouseName });
-
-            if (existingItem) {
-                existingItem.quantity = (parseInt(existingItem.quantity) || 0) + parseInt(quantity);
-                await existingItem.save();
-                res.status(200).json(existingItem);
-            } else {
-                const newItem = new MainStores(req.body);
-
-                const savedItem = await newItem.save();
-                res.status(200).json(savedItem);
-            }
-        } catch (err) {
-            res.status(500).json("Something went wrong!");
-        }
-    });
-};
 
 //Hole sale
 const HoleSall = async (req, res) => {
@@ -98,7 +65,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "mainstore",
                     sellType: "Hole",
@@ -124,7 +90,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "mainstore",
                     sellType: "Hole",
@@ -200,7 +165,6 @@ const Maintransaction = async (req, res) => {
                         itemCode: currentItem.itemCode,
                         specification: currentItem.specification,
                         type: currentItem.type,
-                        expireDate: currentItem.expireDate,
                         warehouseName: warehouseName,
                         quantity: quantity,
                     });
@@ -218,7 +182,6 @@ const Maintransaction = async (req, res) => {
                         itemCode: currentItem.itemCode,
                         specification: currentItem.specification,
                         type: currentItem.type,
-                        expireDate: currentItem.expireDate,
                         warehouseName: warehouseName,
                         quantity: quantity,
                     });
@@ -276,50 +239,6 @@ const transaction = async (req, res) => {
         }
     });
 };
-
-
-//updaet MainStore
-const updateMainStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can update MainStores")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can update MainStores!")
-        const tobeUpdated = req.params.id;
-        try {
-            const MainStore = await MainStores.findByIdAndUpdate(tobeUpdated, {
-                $set: req.body,
-            })
-            res.status(200).json("updated");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!")
-        }
-    })
-}
-
-//delete
-const deleteMainStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can delete MainStores!")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can delete MainStores!")
-        try {
-            await MainStores.findByIdAndDelete(req.params.id);
-            res.status(200).json("MainStore has been deleted");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!");
-        }
-    });
-}
 
 //get all MainStores
 const getAll = async (req, res) => {
@@ -402,4 +321,4 @@ const getAllbyDate = async (req, res) => {
     })
 }
 
-module.exports = { addMainStore, deleteMainStore, getAll, updateMainStore, transaction, Maintransaction, HoleSall, getAllbyDate };
+module.exports = { getAll, transaction, Maintransaction, HoleSall, getAllbyDate };

@@ -13,9 +13,6 @@ const PendingSchema = new mongoose.Schema({
     type: {
         type: String,
     },
-    expireDate: {
-        type: String,
-    },
     company: {
         type: String,
     },

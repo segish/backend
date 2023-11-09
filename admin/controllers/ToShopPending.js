@@ -28,24 +28,21 @@ const deletePending = async (req, res) => {
             });
 
             if (exists) {
-                exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                exists.pendingToshopQuantity = (parseInt(exists.pendingToshopQuantity) || 0) - parseInt(pending.quantity);
                 await exists.save();
-                await ToShopPending.findByIdAndDelete(toBeDeleted);
-                res.status(200).json("Pending has been deleted");
             } else {
                 const newItem = new SubStores({
                     name: pending.name,
                     itemCode: pending.itemCode,
                     specification: pending.specification,
                     type: pending.type,
-                    expireDate: pending.expireDate,
                     warehouseName: pending.from,
                     quantity: pending.quantity,
                 });
                 await newItem.save();
-                await ToShopPending.findByIdAndDelete(toBeDeleted);
-                res.status(200).json("Pending has been deleted");
             }
+            await ToShopPending.findByIdAndDelete(toBeDeleted);
+            res.status(200).json("Pending has been deleted");
         } catch (err) {
             return res.status(500).json("somthing went wrong!");
         }
@@ -67,6 +64,30 @@ const approvePending = async (req, res) => {
             const toBeDeleted = req.params.id;
             const pending = await ToShopPending.findById(toBeDeleted);
             if (!pending) return res.status(401).json("item not found!");
+
+            const exists = await SubStores.findOne({
+                itemCode: pending.itemCode,
+                warehouseName: pending.from
+            });
+            if (!exists) return res.status(500).json("somthing went wrong!");
+            const quantity = parseInt(pending.quantity) || 0;
+            const currentQuantity = parseInt(exists.quantity) || 0;
+            const pendingToshopQuantity = parseInt(exists.pendingToshopQuantity) || 0;
+            const pendingSaleQuantity = parseInt(exists.pendingSaleQuantity) || 0;
+            if (quantity > pendingToshopQuantity
+                || quantity > (currentQuantity - pendingSaleQuantity)
+                || pendingToshopQuantity > (currentQuantity - pendingSaleQuantity )) return res.status(500).json("somthing went wrong!");
+
+            if (pendingSaleQuantity === 0 && quantity === pendingToshopQuantity === currentQuantity) {
+                await SubStores.findOneAndDelete({
+                    itemCode: pending.itemCode,
+                    warehouseName: pending.from
+                });
+            } else {
+                exists.pendingToshopQuantity = (parseInt(exists.pendingToshopQuantity) || 0) - quantity;
+                exists.quantity = (parseInt(exists.quantity) || 0) - quantity;
+                exists.save();
+            }
 
             if (TransactionToShop(pending.quantity, pending, pending.to)) {
 

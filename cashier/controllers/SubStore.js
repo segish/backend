@@ -27,27 +27,33 @@ const transaction = async (req, res) => {
                 return res.status(404).json("Item not found");
             }
             const currentQuantity = parseInt(item.quantity) || 0;
-            if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
             const newItem = new ToShopPending({
                 name: item.name,
                 itemCode: item.itemCode,
                 specification: item.specification,
                 type: item.type,
-                expireDate: item.expireDate,
                 cashierName: currentUser.adminName,
                 quantity: quantity,
                 from: item.warehouseName,
                 to: warehouseName,
             });
             await newItem.save();
-            if (quantity === currentQuantity) {
-                await SubStores.findByIdAndDelete(itemId);
-                res.status(200).json("Item has moved to pending waitin to be approved by admin");
-            } else if (quantity < currentQuantity) {
-                item.quantity = currentQuantity - quantity;
-                await item.save();
-                res.status(200).json("Item has moved to pending waitin to be approved by admin");
-            }
+
+            item.pendingToshopQuantity = pendingToshopQuantity + quantity;
+            await item.save();
+            res.status(200).json("Item has moved to pending waiting to be approved by admin");
+
+            // if (quantity === currentQuantity) {
+            //     await SubStores.findByIdAndDelete(itemId);
+            //     res.status(200).json("Item has moved to pending waitin to be approved by admin");
+            // } else if (quantity < currentQuantity) {
+            //     item.quantity = currentQuantity - quantity;
+            //     await item.save();
+            //     res.status(200).json("Item has moved to pending waitin to be approved by admin");
+            // }
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }
@@ -82,9 +88,11 @@ const HoleSall = async (req, res) => {
             if (!item) {
                 return res.status(404).json("Item not found");
             }
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
             const currentQuantity = parseInt(item.quantity) || 0;
 
-            if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            if (quantity > (currentQuantity - (pendingSaleQuantity + pendingToshopQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
             if (paymentMethod === "halfpaid") {
 
                 const phone = req.body.phone;
@@ -98,7 +106,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     from: item.warehouseName,
                     to: customerName,
                     cashierName: currentUser.adminName,
@@ -121,7 +128,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     from: item.warehouseName,
                     to: customerName,
                     cashierName: currentUser.adminName,
@@ -136,14 +142,17 @@ const HoleSall = async (req, res) => {
                 });
                 await newpendingItem.save();
             }
-            if (quantity === currentQuantity) {
-                await SubStores.findByIdAndDelete(itemId);
-                res.status(200).json("Item has moved to pending waiting to be approved by admin");
-            } else if (quantity < currentQuantity) {
-                item.quantity = currentQuantity - quantity;
-                await item.save();
-                res.status(200).json("Item has moved to pending waiting to be approved by admin");
-            }
+            item.pendingSaleQuantity = pendingSaleQuantity + quantity;
+            await item.save();
+            res.status(200).json("Item has moved to pending waiting to be approved by admin");
+            // if (quantity === currentQuantity) {
+            //     await SubStores.findByIdAndDelete(itemId);
+            //     res.status(200).json("Item has moved to pending waiting to be approved by admin");
+            // } else if (quantity < currentQuantity) {
+            //     item.quantity = currentQuantity - quantity;
+            //     await item.save();
+            //     res.status(200).json("Item has moved to pending waiting to be approved by admin");
+            // }
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }

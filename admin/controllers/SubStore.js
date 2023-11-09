@@ -7,42 +7,6 @@ const SellsHistory = require("../models/SellsHistory")
 const dotenv = require("dotenv");
 dotenv.config();
 
-//add SubStore
-
-const addSubStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        try {
-            const currentUser = await Admin.findById(userInfo.id);
-            if (!currentUser) return res.status(403).json("Only admin can add SubStores");
-            if (currentUser.type !== "admin") return res.status(403).json("Only admin can add SubStores");
-
-            const { itemCode, quantity, warehouseName, ...otherFields } = req.body;
-
-            const existingItem = await SubStores.findOne({ itemCode, warehouseName });
-
-            if (existingItem) {
-                existingItem.quantity = (parseInt(existingItem.quantity) || 0) + parseInt(quantity);
-                await existingItem.save();
-                res.status(200).json(existingItem);
-            } else {
-                const newItem = new SubStores(req.body);
-
-                const savedItem = await newItem.save();
-                res.status(200).json(savedItem);
-            }
-        } catch (err) {
-            res.status(500).json("Something went wrong!");
-        }
-    });
-}
-
-
-
 //Hole sale
 const HoleSall = async (req, res) => {
     const token = req.cookies.adminAccessToken;
@@ -68,7 +32,9 @@ const HoleSall = async (req, res) => {
             }
 
             const currentQuantity = parseInt(item.quantity) || 0;
-            if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
             if (paymentMethod === "halfpaid") {
 
                 const phone = req.body.phone;
@@ -98,7 +64,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "subStore",
                     sellType: "Hole",
@@ -123,7 +88,6 @@ const HoleSall = async (req, res) => {
                     itemCode: item.itemCode,
                     specification: item.specification,
                     type: item.type,
-                    expireDate: item.expireDate,
                     quantity: quantity,
                     warehouseType: "subStore",
                     sellType: "Hole",
@@ -151,13 +115,13 @@ const HoleSall = async (req, res) => {
                 });
                 await newHistoryItem.save();
             }
-            if (quantity === currentQuantity) {
+            if (quantity === currentQuantity && pendingSaleQuantity === 0 && pendingToshopQuantity === 0) {
                 await SubStores.findByIdAndDelete(itemId);
                 res.status(200).json("Item has soled");
             } else if (quantity < currentQuantity) {
                 item.quantity = currentQuantity - quantity;
                 await item.save();
-                res.status(200).json(item);
+                res.status(200).json("Item has soled");
             }
         } catch (err) {
             res.status(500).json("Something went wrong!");
@@ -165,7 +129,7 @@ const HoleSall = async (req, res) => {
     });
 };
 
-//transaction main to main
+//transaction sub to sub
 const Subtransaction = async (req, res) => {
     const token = req.cookies.adminAccessToken;
     if (!token) return res.status(401).json("You must log in first!");
@@ -187,7 +151,11 @@ const Subtransaction = async (req, res) => {
             const existingItem = await SubStores.findOne({ itemCode: currentItem.itemCode, warehouseName });
 
             const currentQuantity = parseInt(currentItem.quantity) || 0;
-            if (quantity === currentQuantity) {
+            const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            
+            if (quantity === currentQuantity && pendingSaleQuantity === 0 && pendingToshopQuantity === 0) {
 
                 if (existingItem) {
                     existingItem.quantity = (parseInt(existingItem.quantity) || 0) + parseInt(quantity);
@@ -198,7 +166,6 @@ const Subtransaction = async (req, res) => {
                         itemCode: currentItem.itemCode,
                         specification: currentItem.specification,
                         type: currentItem.type,
-                        expireDate: currentItem.expireDate,
                         warehouseName: warehouseName,
                         quantity: quantity,
                     });
@@ -216,7 +183,6 @@ const Subtransaction = async (req, res) => {
                         itemCode: currentItem.itemCode,
                         specification: currentItem.specification,
                         type: currentItem.type,
-                        expireDate: currentItem.expireDate,
                         warehouseName: warehouseName,
                         quantity: quantity,
                     });
@@ -225,9 +191,7 @@ const Subtransaction = async (req, res) => {
                 currentItem.quantity = currentQuantity - quantity;
                 await currentItem.save();
                 res.status(200).json(currentItem);
-            } else {
-                res.status(400).json("Invalid quantity. Cannot remove more items than available.");
-            }
+            } 
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }
@@ -257,7 +221,11 @@ const transaction = async (req, res) => {
             }
 
             const currentQuantity = parseInt(item.quantity) || 0;
-            if (quantity === currentQuantity) {
+            const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
+            const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
+            if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+
+            if (quantity === currentQuantity && pendingSaleQuantity === 0 && pendingToshopQuantity === 0) {
                 if (TransactionToShop(quantity, item, warehouseName)) {
                     await SubStores.findByIdAndDelete(itemId);
                     res.status(200).json("Item has moved");
@@ -272,56 +240,12 @@ const transaction = async (req, res) => {
                 } else {
                     res.status(500).json("Something went wrong!");
                 }
-            } else {
-                res.status(400).json("Invalid quantity. Cannot remove more items than available.");
-            }
+            } 
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }
     });
 };
-
-//updat SubStore
-const updateSubStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can update SubStores")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can update SubStores!")
-        const tobeUpdated = req.params.id;
-        try {
-            const SubStore = await SubStores.findByIdAndUpdate(tobeUpdated, {
-                $set: req.body,
-            })
-            res.status(200).json("updated");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!")
-        }
-    })
-}
-
-const deleteSubStore = async (req, res) => {
-    const token = req.cookies.adminAccessToken;
-    if (!token) return res.status(401).json("You must login first!");
-
-    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
-
-        const currentUser = await Admin.findById(userInfo.id);
-        if (!currentUser) return res.status(403).json("only admin can delete SubStores!")
-        if (currentUser.type != "admin") return res.status(403).json("only admin can delete SubStores!")
-        try {
-            await SubStores.findByIdAndDelete(req.params.id);
-            res.status(200).json("SubStore has been deleted");
-        } catch (err) {
-            return res.status(500).json("somthing went wrong!");
-        }
-    });
-}
 
 //get all SubStores
 const getAll = async (req, res) => {
@@ -342,4 +266,4 @@ const getAll = async (req, res) => {
         }
     })
 }
-module.exports = { addSubStore, deleteSubStore, getAll, updateSubStore, transaction, Subtransaction, HoleSall };
+module.exports = { getAll, transaction, Subtransaction, HoleSall };

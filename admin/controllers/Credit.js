@@ -39,7 +39,6 @@ const canceleCredite = async (req, res) => {
                         itemCode: credite.itemCode,
                         specification: credite.specification,
                         type: credite.type,
-                        expireDate: credite.expireDate,
                         warehouseName: credite.warehouseName,
                         quantity: credite.quantity,
                     });
@@ -59,7 +58,6 @@ const canceleCredite = async (req, res) => {
                         itemCode: credite.itemCode,
                         specification: credite.specification,
                         type: credite.type,
-                        expireDate: credite.expireDate,
                         warehouseName: credite.warehouseName,
                         quantity: credite.quantity,
                     });
@@ -79,7 +77,6 @@ const canceleCredite = async (req, res) => {
                         itemCode: credite.itemCode,
                         specification: credite.specification,
                         type: credite.type,
-                        expireDate: credite.expireDate,
                         warehouseName: credite.warehouseName,
                         quantity: credite.quantity,
                     });

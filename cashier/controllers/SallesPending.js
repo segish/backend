@@ -32,7 +32,7 @@ const deletePending = async (req, res) => {
                     warehouseName: pending.from
                 });
                 if (exists) {
-                    exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - parseInt(pending.quantity);
                     await exists.save();
                 } else {
                     const newItem = new SubStores({
@@ -40,7 +40,6 @@ const deletePending = async (req, res) => {
                         itemCode: pending.itemCode,
                         specification: pending.specification,
                         type: pending.type,
-                        expireDate: pending.expireDate,
                         warehouseName: pending.from,
                         quantity: pending.quantity,
                     });
@@ -52,7 +51,7 @@ const deletePending = async (req, res) => {
                     warehouseName: pending.from
                 });
                 if (exists) {
-                    exists.quantity = (parseInt(exists.quantity) || 0) + parseInt(pending.quantity);
+                    exists.pendingSaleQuantity = (parseInt(exists.pendingSaleQuantity) || 0) - parseInt(pending.quantity);
                     await exists.save();
                 } else {
                     const newItem = new Shops({
@@ -60,7 +59,6 @@ const deletePending = async (req, res) => {
                         itemCode: pending.itemCode,
                         specification: pending.specification,
                         type: pending.type,
-                        expireDate: pending.expireDate,
                         warehouseName: pending.from,
                         quantity: pending.quantity,
                     });

@@ -13,14 +13,19 @@ const SubStoreSchema = new mongoose.Schema({
     type: {
         type: String,
     },
-    expireDate: {
-        type: String,
-    },
     warehouseName: {
         type: String,
     },
     quantity: {
         type: String,
+    },
+    pendingSaleQuantity: {
+        type: String,
+        default: "0",
+    },
+    pendingToshopQuantity: {
+        type: String,
+        default: "0",
     },
 },
     { timestamps: true },

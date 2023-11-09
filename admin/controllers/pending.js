@@ -99,7 +99,6 @@ const approvePending = async (req, res) => {
                     itemCode: pending.itemCode,
                     specification: pending.specification,
                     type: pending.type,
-                    expireDate: pending.expireDate,
                     quantity: pending.quantity,
                     warehouseName: warehouseName,
                 });

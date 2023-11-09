@@ -13,9 +13,6 @@ const ToShopPendingSchema = new mongoose.Schema({
     type: {
         type: String,
     },
-    expireDate: {
-        type: String,
-    },
     cashierName: {
         type: String,
     },

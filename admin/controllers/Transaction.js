@@ -13,7 +13,6 @@ const Transaction = async (quantity, item, warehouseName) => {
             itemCode: item.itemCode,
             specification: item.specification,
             type: item.type,
-            expireDate: item.expireDate,
             warehouseName: warehouseName,
             quantity: quantity,
         });
