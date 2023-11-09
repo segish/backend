@@ -7,7 +7,7 @@ dotenv.config();
 
 //get not approved/pending
 const getAll = async (req, res) => {
-  const token = req.cookies.accessToken;
+  const token = req.cookies.adminAccessToken;
   if (!token) return res.status(401).json("You must login first!");
 
   jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
@@ -31,7 +31,7 @@ const getAll = async (req, res) => {
 
 //get apprved/history
 const expenseHistory = async (req, res) => {
-  const token = req.cookies.accessToken;
+  const token = req.cookies.adminAccessToken;
   if (!token) return res.status(401).json("You must login first!");
 
   jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
@@ -55,7 +55,7 @@ const expenseHistory = async (req, res) => {
 
 //make expense by Admin
 const approveExpenses = async (req, res) => {
-  const token = req.cookies.accessToken;
+  const token = req.cookies.adminAccessToken;
   if (!token) return res.status(401).json("You must login first!");
 
   jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
