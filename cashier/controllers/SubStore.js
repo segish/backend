@@ -119,6 +119,8 @@ const HoleSall = async (req, res) => {
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "Hole",
+                    approvedByCashier: false,
+                    isCreditAtPendingSale: true,
                 });
                 await newpendingItem.save();
 
@@ -139,6 +141,8 @@ const HoleSall = async (req, res) => {
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "Hole",
+                    approvedByCashier: false,
+                    isCreditAtPendingSale: true,
                 });
                 await newpendingItem.save();
             }

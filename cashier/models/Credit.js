@@ -46,7 +46,11 @@ const CreditSchema = new mongoose.Schema({
     },
     approvedByCashier: {
         type: Boolean,
-        default:false,
+        default: false,
+    },
+    isCreditAtPendingSale: {
+        type: Boolean,
+        default: false,
     },
 },
     { timestamps: true },

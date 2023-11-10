@@ -25,6 +25,10 @@ const SallesPendingSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
     },
+    approvedByCashier: {
+        type: Boolean,
+        default: false,
+    },
     halfPayMethod: {
         type: String,
     },

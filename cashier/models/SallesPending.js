@@ -43,6 +43,14 @@ const SallesPendingSchema = new mongoose.Schema({
     paymentDate: {
         type: String,
     },
+    approvedByCashier: {
+        type: Boolean,
+        default: false,
+    },
+    isCreditAtPendingSale: {
+        type: Boolean,
+        default: true,
+    },
     phone: {
         type: String,
     },

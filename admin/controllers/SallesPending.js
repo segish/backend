@@ -120,7 +120,8 @@ const ApprovePending = async (req, res) => {
                     warehouseName: pending.from,
                     paymentDate: pending.paymentDate,
                     cheque: pending.cheque,
-                    creditType: "half"
+                    creditType: "half",
+                    approvedByCashier:pending.approvedByCashier,
                 });
                 await newCredit.save();
 
@@ -139,6 +140,7 @@ const ApprovePending = async (req, res) => {
                     warehouseName: pending.from,
                     paymentDate: pending.paymentDate,
                     cheque: pending.cheque,
+                    approvedByCashier: pending.approvedByCashier,
                 });
                 await newCredit.save();
             } else {

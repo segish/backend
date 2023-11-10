@@ -48,8 +48,8 @@ const transaction = async (req, res) => {
                     specification: item.specification,
                     type: item.type,
                     from: item.warehouseName,
-                    to: customerName,
                     cashierName: currentUser.adminName,
+                    to: customerName,
                     quantity: quantity,
                     paymentMethod: paymentMethod,
                     halfPayMethod: halfPayMethod,
@@ -60,6 +60,8 @@ const transaction = async (req, res) => {
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "retail",
+                    approvedByCashier: false,
+                    isCreditAtPendingSale: true,
                 });
                 await newpendingItem.save();
 
@@ -80,6 +82,8 @@ const transaction = async (req, res) => {
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "retail",
+                    approvedByCashier: false,
+                    isCreditAtPendingSale: true,
                 });
                 await newpendingItem.save();
             }
