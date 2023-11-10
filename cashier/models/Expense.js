@@ -5,7 +5,7 @@ const ExpenseSchema = new mongoose.Schema(
     reason: {
       type: String,
     },
-    cashierName: {
+    warehouseName: {
       type: String,
     },
     amount: {
@@ -13,7 +13,7 @@ const ExpenseSchema = new mongoose.Schema(
     },
     approved: {
       type: Boolean,
-      default:false,
+      default: false,
     },
   },
   { timestamps: true }

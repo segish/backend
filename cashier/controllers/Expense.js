@@ -72,7 +72,6 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: currentUser.warehouseName,
-            cashierName: currentUser.adminName,
             paymentMethod: "cash",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -91,9 +90,8 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             from: currentUser.warehouseName,
-            cashierName: currentUser.adminName,
             paymentMethod: "halfpaid",
-            halfPayMethod:"cash",
+            halfPayMethod: "cash",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
@@ -108,10 +106,29 @@ const totalSaleAndExpense = async (req, res) => {
         },
       ];
 
-      const expensePipeline = [
+      const creditPipeline = [
         {
           $match: {
-            cashierName: currentUser.adminName,
+            from: currentUser.warehouseName,
+            paymentMethod: "credit",
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+      const transferPipeline = [
+        {
+          $match: {
+            from: currentUser.warehouseName,
+            paymentMethod: { $regex: "transfer" }, 
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
@@ -126,16 +143,40 @@ const totalSaleAndExpense = async (req, res) => {
         },
       ];
 
-      const result = await SallesPending.aggregate(pipeline);
+      const expensePipeline = [
+        {
+          $match: {
+            warehouseName: currentUser.warehouseName,
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+
+      const cashResult = await SallesPending.aggregate(pipeline);
+      const creditResult = await SallesPending.aggregate(creditPipeline);
+      const transferTesult = await SallesPending.aggregate(transferPipeline);
       const resultPartial = await SallesPending.aggregate(halfpipeline);
       const expenseResult = await Expense.aggregate(expensePipeline);
 
-      const totalSale = result.length > 0 ? result[0].totalAmount : 0;
+      const totalSaleCash = cashResult.length > 0 ? cashResult[0].totalAmount : 0;
+      const totalSaleCredit = creditResult.length > 0 ? creditResult[0].totalAmount : 0;
+      const totalSaleTransfer = transferTesult.length > 0 ? transferTesult[0].totalAmount : 0;
       const totalPartialSale = resultPartial.length > 0 ? resultPartial[0].totalAmount : 0;
       const totalExpense = expenseResult.length > 0 ? expenseResult[0].totalAmount : 0;
-      
+
       const totalResponse = {
-        totalSale: totalSale + totalPartialSale,
+        totalSale: totalSaleCash + totalPartialSale,
+        totalSaleCredit: totalSaleCredit,
+        totalSaleTransfer: totalSaleTransfer,
         totalExpense: totalExpense,
       }
       res.status(200).json(totalResponse)
@@ -237,7 +278,7 @@ const makeExpense = async (req, res) => {
         reason: reason,
         amount: amount,
         approved: false,
-        cashierName: currentUser.adminName,
+        warehouseName: currentUser.warehouseName,
       });
       newExpense.save();
       res.status(200).json("expense added to expense pending!!");
