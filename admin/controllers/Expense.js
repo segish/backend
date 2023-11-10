@@ -203,6 +203,6 @@ const totalSaleAndExpense = async (req, res) => {
     } catch (err) {
       res.status(500).json("somthing went wrong!");
     }
-  // });
+  });
 };
 module.exports = { getAll, approveExpenses, expenseHistory, totalSaleAndExpense };
