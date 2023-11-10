@@ -3,7 +3,7 @@ const { getAll, approveExpenses, expenseHistory, totalSaleAndExpense } = require
 
 router.get("/getall", getAll);
 router.get("/getexpensehistory", expenseHistory);
-router.get("/total", totalSaleAndExpense);
+router.post("/total", totalSaleAndExpense);
 router.post("/approve/:id", approveExpenses);
 
 module.exports = router;
