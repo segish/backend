@@ -76,16 +76,16 @@ const approveExpenses = async (req, res) => {
 };
 
 const totalSaleAndExpense = async (req, res) => {
-  const token = req.cookies.adminAccessToken;
-  if (!token) return res.status(401).json("You must login first!");
+  // const token = req.cookies.adminAccessToken;
+  // if (!token) return res.status(401).json("You must login first!");
 
-  jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
-    if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
+  // jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
+  //   if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
     try {
-      const currentUser = await Cashier.findById(userInfo.id);
-      if (!currentUser) return res.status(403).json("only cashier can access expenses");
+  //     const currentUser = await Admin.findById(userInfo.id);
+  //     if (!currentUser) return res.status(403).json("only cashier can access expenses");
 
-      const { cashierName, warehouseName } = req.body;
+      const { warehouseName } = req.body;
       const today = new Date(); // Get the current date
       const pipeline = [
         {
@@ -202,6 +202,6 @@ const totalSaleAndExpense = async (req, res) => {
     } catch (err) {
       res.status(500).json("somthing went wrong!");
     }
-  });
+  // });
 };
 module.exports = { getAll, approveExpenses, expenseHistory, totalSaleAndExpense };
