@@ -86,8 +86,9 @@ const totalSaleAndExpense = async (req, res) => {
       if (!currentUser) return res.status(403).json("only cashier can access expenses");
 
       const { warehouseName } = req.body;
-      const today = new Date(); // Get the current date
-      const pipeline = [
+      const today = new Date(); 
+      
+      const cashPipeline = [
         {
           $match: {
             from: warehouseName,
@@ -105,7 +106,7 @@ const totalSaleAndExpense = async (req, res) => {
           },
         },
       ];
-      const halfpipeline = [
+      const halfCashPipeline = [
         {
           $match: {
             from: warehouseName,
@@ -143,11 +144,11 @@ const totalSaleAndExpense = async (req, res) => {
           },
         },
       ];
-      const transferPipeline = [
+      const TotalPartialPipeline = [
         {
           $match: {
             from: warehouseName,
-            paymentMethod: { $regex: "transfer" }, 
+            paymentMethod: "halfpaid",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
@@ -158,6 +159,44 @@ const totalSaleAndExpense = async (req, res) => {
           $group: {
             _id: null,
             totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+      const transferPipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            paymentMethod: { $regex: "transfer" },
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+      ];
+
+      const halfTransferPipeline = [
+        {
+          $match: {
+            from: warehouseName,
+            paymentMethod: "halfpaid",
+            halfPayMethod: { $regex: "transfer" },
+            createdAt: {
+              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
+              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+            },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: "$paidamount" },
           },
         },
       ];
@@ -180,22 +219,26 @@ const totalSaleAndExpense = async (req, res) => {
         },
       ];
 
-      const cashResult = await SallesPending.aggregate(pipeline);
+      const cashResult = await SallesPending.aggregate(cashPipeline);
+      const PartialCash = await SallesPending.aggregate(halfCashPipeline);
       const creditResult = await SallesPending.aggregate(creditPipeline);
+      const totalPartialSale = await SallesPending.aggregate(TotalPartialPipeline);
       const transferTesult = await SallesPending.aggregate(transferPipeline);
-      const resultPartial = await SallesPending.aggregate(halfpipeline);
+      const halfTransfer = await SallesPending.aggregate(halfTransferPipeline);
       const expenseResult = await Expense.aggregate(expensePipeline);
 
       const totalSaleCash = cashResult.length > 0 ? cashResult[0].totalAmount : 0;
+      const totalPartialCashSale = PartialCash.length > 0 ? PartialCash[0].totalAmount : 0;
       const totalSaleCredit = creditResult.length > 0 ? creditResult[0].totalAmount : 0;
+      const netPartialSale = totalPartialSale.length > 0 ? totalPartialSale[0].totalAmount : 0;
       const totalSaleTransfer = transferTesult.length > 0 ? transferTesult[0].totalAmount : 0;
-      const totalPartialSale = resultPartial.length > 0 ? resultPartial[0].totalAmount : 0;
+      const totalPartialTransfer = halfTransfer.length > 0 ? halfTransfer[0].totalAmount : 0;
       const totalExpense = expenseResult.length > 0 ? expenseResult[0].totalAmount : 0;
 
       const totalResponse = {
-        totalSale: totalSaleCash + totalPartialSale,
-        totalSaleCredit: totalSaleCredit,
-        totalSaleTransfer: totalSaleTransfer,
+        totalSale: totalSaleCash + totalPartialCashSale,
+        totalSaleCredit: totalSaleCredit + netPartialSale - totalPartialCashSale - totalPartialTransfer,
+        totalSaleTransfer: totalSaleTransfer + totalPartialTransfer,
         totalExpense: totalExpense,
       }
       res.status(200).json(totalResponse)
