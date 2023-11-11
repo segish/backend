@@ -251,7 +251,7 @@ const updateUser = async (req, res) => {
                 if (existingEmail && existingEmail._id.toString() !== tobeUpdated) return res.status(403).json("email already exists");
                 const existingphone = await Cashier.findOne({ phone: req.body.phone });
                 if (existingphone && existingphone._id.toString() !== tobeUpdated) return res.status(403).json("phone already exists");
-                const existingShop = await Cashier.findOne({ phone: req.body.warehouseName });
+                const existingShop = await Cashier.findOne({ warehouseName: req.body.warehouseName });
                 if (existingShop && existingShop._id.toString() !== tobeUpdated) return res.status(403).json("A cshier account already exists for this shop");
                 await Cashier.findByIdAndUpdate(tobeUpdated, {
                     $set: updateFields,

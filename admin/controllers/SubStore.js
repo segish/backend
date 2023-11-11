@@ -24,8 +24,12 @@ const HoleSall = async (req, res) => {
             const quantity = parseInt(req.body.quantity);
             const customerName = req.body.customerName;
             const paymentMethod = req.body.paymentMethod;
+            const phone = req.body.phone;
             const amount = parseFloat(req.body.amount) * quantity;
             const item = await SubStores.findById(itemId);
+            if (!amount || !quantity || !paymentMethod) return res.status(400).json("please enter all required inputs!");
+            if ((paymentMethod === "halfpaid" || paymentMethod === "credit") && (!customerName || !phone)) return res.status(400).json("please enter customer name and phone number!");
+
 
             if (!item) {
                 return res.status(404).json("Item not found");
@@ -37,11 +41,12 @@ const HoleSall = async (req, res) => {
             if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
             if (paymentMethod === "halfpaid") {
 
-                const phone = req.body.phone;
                 const paymentDate = req.body.paymentDate;
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
+                if (!paidamount || !halfPayMethod) return res.status(400).json("please enter all required inputs!");
+                if (paidamount >= amount) return res.status(400).json("paid amount must be less than total amount " + amount);
 
                 const newHistoryItem = new SellsHistory({
                     name: item.name,
@@ -145,6 +150,7 @@ const Subtransaction = async (req, res) => {
             const itemId = req.params.id;
             const warehouseName = req.body.warehouseName;
             const quantity = parseInt(req.body.quantity)
+            if (!quantity || !warehouseName) return res.status(400).json("please enter quantity and warehouse name!");
 
             const currentItem = await SubStores.findById(itemId);
             if (!currentItem) return res.status(404).json("Item not found");
@@ -215,6 +221,7 @@ const transaction = async (req, res) => {
             const quantity = parseInt(req.body.quantity);
             const warehouseName = req.body.warehouseName;
             const item = await SubStores.findById(itemId);
+            if (!quantity || !warehouseName) return res.status(400).json("please enter quantity and warehouse name!");
 
             if (!item) {
                 return res.status(404).json("Item not found");

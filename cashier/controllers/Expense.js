@@ -315,7 +315,7 @@ const makeExpense = async (req, res) => {
       //   return res.status(403).json("you dont have any sales today to make expenses");
       // if ((totalSale + totalPartialSale - totalExpenseAmount) < amount)
       //   return res.status(403).json("you dont have enough sales today to make this expense");
-
+      if (!amount) return res.status(400).json("please enter amount!");
       const newExpense = new Expense({
         reason: reason,
         amount: amount,

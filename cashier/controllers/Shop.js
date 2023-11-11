@@ -25,6 +25,9 @@ const transaction = async (req, res) => {
             const phone = req.body.phone;
             const cheque = req.body.cheque;
 
+            if (!amount || !quantity || !paymentMethod) return res.status(400).json("please enter all required inputs!");
+
+
             const item = await Shops.findById(itemId);
 
             if (!item) return res.status(404).json("Item not found");
@@ -41,6 +44,8 @@ const transaction = async (req, res) => {
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
+                if (!paidamount || !halfPayMethod) return res.status(400).json("please enter all required inputs!");
+                if (paidamount >= amount) return res.status(400).json("paid amount must be less than total amount " + amount);
 
                 const newpendingItem = new SallesPending({
                     name: item.name,
