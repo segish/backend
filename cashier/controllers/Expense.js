@@ -21,7 +21,7 @@ const getAll = async (req, res) => {
     try {
       const expenses = await Expense.find({
         approved: false,
-        cashierName: currentUser.adminName,
+        cashierName: currentUser.warehouseName,
       });
       res.status(200).json(expenses);
     } catch (err) {
@@ -46,7 +46,7 @@ const expenseHistory = async (req, res) => {
     try {
       const expenses = await Expense.find({
         approved: true,
-        cashierName: currentUser.adminName,
+        cashierName: currentUser.warehouseName,
       });
       res.status(200).json(expenses);
     } catch (err) {
