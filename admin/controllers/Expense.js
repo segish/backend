@@ -204,6 +204,7 @@ const totalSaleAndExpense = async (req, res) => {
       const expensePipeline = [
         {
           $match: {
+            approved:false,
             warehouseName: warehouseName,
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today

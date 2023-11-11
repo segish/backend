@@ -185,6 +185,7 @@ const totalSaleAndExpense = async (req, res) => {
         {
           $match: {
             warehouseName: currentUser.warehouseName,
+            approved:false,
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
               $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
