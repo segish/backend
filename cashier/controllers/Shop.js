@@ -70,6 +70,33 @@ const transaction = async (req, res) => {
                 });
                 await newpendingItem.save();
 
+            }else if (paymentMethod === "cash/transfer") {
+                
+                const paidamount = parseFloat(req.body.paidamount);
+                const halfPayMethod = req.body.halfPayMethod;
+                if (!paidamount || !halfPayMethod) return res.status(400).json("please enter all required inputs!");
+                if (paidamount >= amount) return res.status(400).json("amount in cash must be less than total amount " + amount);
+
+                const newpendingItem = new SallesPending({
+                    name: item.name,
+                    itemCode: item.itemCode,
+                    specification: item.specification,
+                    type: item.type,
+                    from: item.warehouseName,
+                    cashierName: currentUser.adminName,
+                    to: customerName,
+                    quantity: quantity,
+                    paymentMethod: paymentMethod,
+                    halfPayMethod: halfPayMethod,
+                    warehouseType: "shop",
+                    amount: amount,
+                    paidamount: paidamount,//cash amount
+                    sellType: "retail",
+                    approvedByCashier: false,
+                    isCreditAtPendingSale: true,
+                });
+                await newpendingItem.save();
+
             } else {
                 const newpendingItem = new SallesPending({
                     name: item.name,
