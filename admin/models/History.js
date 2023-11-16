@@ -28,5 +28,5 @@ const HistorySchema = new mongoose.Schema({
 },
     { timestamps: true },
 );
-
+HistorySchema.index({ createdAt: 1 }, { expireAfterSeconds: 31536000 });
 module.exports = mongoose.model("History", HistorySchema);

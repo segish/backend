@@ -10,9 +10,9 @@ var savedOTPs = {};
 const login = async (req, res) => {
     try {
         const Cashiers = await Cashier.findOne({ email: req.body.email });
-        if (!Cashiers) return res.status(404).json("Incorect emiail or password");
+        if (!Cashiers) return res.status(404).json("Incorrect emial or password");
         const validPssword = await bcrypt.compare(req.body.password, Cashiers.password)
-        if (!validPssword) return res.status(400).json("Incorect emiail or password")
+        if (!validPssword) return res.status(400).json("Incorect emial or password")
         const token = jwt.sign({ id: Cashiers.id }, process.env.JWT_SECRETE_KEY, {
             expiresIn: "1d"
         });  //temporary secrete key
@@ -125,7 +125,7 @@ const changePwd = async (req, res) => {
 
         try {
             const currentUser = await Cashier.findById(userInfo.id);
-            if (!currentUser) return res.status(403).json("You cannot change password right now")
+            if (!currentUser) return res.status(403).json("You can not change password right now")
 
             const { oldPassword, newPassword } = req.body
             const validPssword = await bcrypt.compare(oldPassword, currentUser.password)
