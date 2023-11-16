@@ -10,9 +10,9 @@ var savedOTPs = {};
 const login = async (req, res) => {
     try {
         const Cashiers = await Cashier.findOne({ email: req.body.email });
-        if (!Cashiers) return res.status(404).json("Incorrect emial or password");
+        if (!Cashiers) return res.status(404).json("Incorrect email or password");
         const validPssword = await bcrypt.compare(req.body.password, Cashiers.password)
-        if (!validPssword) return res.status(400).json("Incorect emial or password")
+        if (!validPssword) return res.status(400).json("Incorrect email or password")
         const token = jwt.sign({ id: Cashiers.id }, process.env.JWT_SECRETE_KEY, {
             expiresIn: "1d"
         });  //temporary secrete key

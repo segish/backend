@@ -71,9 +71,9 @@ const addAdmin = async (req, res) => {
 const login = async (req, res) => {
     try {
         const admin = await Admin.findOne({ email: req.body.email });
-        if (!admin) return res.status(404).json("Incorrect emial or password");
+        if (!admin) return res.status(404).json("Incorrect emaal or password");
         const validPssword = await bcrypt.compare(req.body.password, admin.password)
-        if (!validPssword) return res.status(400).json("Incorrect emial or password")
+        if (!validPssword) return res.status(400).json("Incorrect email or password")
         const token = jwt.sign({ id: admin.id }, process.env.JWT_SECRETE_KEY, {
             expiresIn: "1d"
         });  //temporary secrete key
