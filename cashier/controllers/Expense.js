@@ -68,10 +68,12 @@ const totalSaleAndExpense = async (req, res) => {
       const currentUser = await Cashier.findById(userInfo.id);
       if (!currentUser) return res.status(403).json("only cashier can access expenses");
       const today = new Date(); // Get the current date
+      const fromWarehouseName = req.body.warehouseName && currentUser.isSubstore ? req.body.warehouseName : currentUser.warehouseName
+      console.log(fromWarehouseName)
       const cashPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "cash",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -89,7 +91,7 @@ const totalSaleAndExpense = async (req, res) => {
       const halfCashPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "halfpaid",
             halfPayMethod: "cash",
             createdAt: {
@@ -108,7 +110,7 @@ const totalSaleAndExpense = async (req, res) => {
       const halfCashTransferPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "cash/transfer",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -126,7 +128,7 @@ const totalSaleAndExpense = async (req, res) => {
       const TotalCashTransferPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "cash/transfer",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -145,7 +147,7 @@ const totalSaleAndExpense = async (req, res) => {
       const creditPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "credit",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -163,7 +165,7 @@ const totalSaleAndExpense = async (req, res) => {
       const TotalPartialPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "halfpaid",
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -181,7 +183,7 @@ const totalSaleAndExpense = async (req, res) => {
       const transferPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: { $regex: "transfer\\(Bank Name" }, 
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
@@ -200,7 +202,7 @@ const totalSaleAndExpense = async (req, res) => {
       const halfTransferPipeline = [
         {
           $match: {
-            from: currentUser.warehouseName,
+            from: fromWarehouseName,
             paymentMethod: "halfpaid",
             halfPayMethod: { $regex: "transfer\\(Bank N" },
             createdAt: {
@@ -220,7 +222,7 @@ const totalSaleAndExpense = async (req, res) => {
       const expensePipeline = [
         {
           $match: {
-            warehouseName: currentUser.warehouseName,
+            warehouseName: fromWarehouseName,
             approved:false,
             createdAt: {
               $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today

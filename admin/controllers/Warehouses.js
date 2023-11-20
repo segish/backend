@@ -28,7 +28,10 @@ const addWarehouse = async (req, res) => {
 
             const existing = await Warehouse.findOne(req.body)
             if (existing) return res.status(409).json("Name Should be unique!!");
-
+            if (req.body.type === "Sub Store") {
+                const existingSubstore = await Warehouse.findOne({ type: req.body.type })
+                if (existingSubstore) return res.status(409).json("You already have sub store before and only one sub store is possible!!");
+            }
             const newWarehouse = new Warehouse(req.body);
             //save and respond 
             const warehouse = await newWarehouse.save();
