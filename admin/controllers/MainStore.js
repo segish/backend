@@ -9,6 +9,79 @@ const Admin = require("../models/Admin")
 const dotenv = require("dotenv");
 dotenv.config();
 
+//add to main store
+const addToMainstore = async (req, res) => {
+    const token = req.cookies.adminAccessToken;
+    if (!token) return res.status(401).json("You must log in first!");
+
+    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
+
+        try {
+            const currentUser = await Admin.findById(userInfo.id);
+            if (!currentUser) return res.status(403).json("Only admin can add to mainstore");
+            if (currentUser.type !== "admin") return res.status(403).json("Only admin can add to mainstore");
+
+            const itemCode = req.body.itemCode
+            const name = req.body.name
+            const type = req.body.type
+            const specification = req.body.specification
+            const quantity = req.body.quantity
+            const warehouseName = req.body.warehouseName;
+            if (!itemCode || !name || !type || !specification || !quantity || !warehouseName) return res.status(400).json("please enter all inputs!");
+
+            const currentItem = await MainStores.findOne({ itemCode: itemCode, warehouseName: warehouseName });
+            if (currentItem) return res.status(400).json("You already have this item you can update its quantity!");
+
+            const newItem = new MainStores({
+                itemCode: itemCode,
+                name: name,
+                type: type,
+                specification: specification,
+                quantity: quantity,
+                warehouseName: warehouseName,
+            });
+            await newItem.save();
+            res.status(200).json(name+" added to main store successfully!");
+        } catch (err) {
+            res.status(500).json("Something went wrong!");
+        }
+    });
+};
+
+//add to main store
+const updateQuantityInMainstore = async (req, res) => {
+    const token = req.cookies.adminAccessToken;
+    if (!token) return res.status(401).json("You must log in first!");
+
+    jwt.verify(token, process.env.JWT_SECRETE_KEY, async (err, userInfo) => {
+        if (err) return res.status(403).json("Some thing went wrong please Logout and Login again ");
+
+        try {
+            const currentUser = await Admin.findById(userInfo.id);
+            if (!currentUser) return res.status(403).json("Only admin can add to mainstore");
+            if (currentUser.type !== "admin") return res.status(403).json("Only admin can add to mainstore");
+
+            const tobeUpdated = req.params.id;
+
+            const comingQuantity = req.body.quantity
+            if (!comingQuantity) return res.status(400).json("please enter the quantity you want to add!");
+
+            const quantity = parseInt(req.body.quantity)
+            if (quantity < 1) return res.status(400).json("please enter valid quantity quantity!");
+
+            const item = await MainStores.findById(tobeUpdated);
+            if (!item) return res.status(404).json("item not found!!");
+            const currentQuantity = parseInt(item.quantity) || 0;
+            item.quantity = currentQuantity + quantity;
+
+            await item.save();
+            res.status(200).json("quantity added!!");
+        } catch (err) {
+            res.status(500).json("Something went wrong!");
+        }
+    });
+};
 
 //Hole sale
 const HoleSall = async (req, res) => {
@@ -135,7 +208,6 @@ const HoleSall = async (req, res) => {
         }
     });
 };
-
 //transaction main to main
 const Maintransaction = async (req, res) => {
     const token = req.cookies.adminAccessToken;
@@ -327,4 +399,4 @@ const getAllbyDate = async (req, res) => {
     })
 }
 
-module.exports = { getAll, transaction, Maintransaction, HoleSall, getAllbyDate };
+module.exports = { addToMainstore, updateQuantityInMainstore, getAll, transaction, Maintransaction, HoleSall, getAllbyDate };
