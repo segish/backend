@@ -97,7 +97,7 @@ const ApprovePending = async (req, res) => {
                     type: pending.type,
                     from: pending.from,
                     to: pending.to,
-                    paymentMethod: pending.halfPayMethod,
+                    paymentMethod: "cash + "+pending.halfPayMethod,
                     quantity: pending.quantity,
                     amount: pending.paidamount,
                     sellType: pending.sellType,
