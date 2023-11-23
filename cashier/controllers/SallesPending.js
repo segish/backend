@@ -92,12 +92,14 @@ const getAll = async (req, res) => {
                     warehouseType: "subStore",
                 });
                 const Pendings = Pending1.concat(Pending2)
-                res.status(200).json(Pendings.sort({ createdAt: 'desc' }));
+                const sortedPendings = Pendings.sort((a, b) => b.createdAt - a.createdAt);
+                res.status(200).json(sortedPendings);
             } else {
                 const Pendings = await SallesPending.find({
                     from: currentUser.warehouseName,
                 });
-                res.status(200).json(Pendings.sort({ createdAt: 'desc' }));
+                const sortedPendings = Pendings.sort((a, b) => b.createdAt - a.createdAt);
+                res.status(200).json(sortedPendings);
             }
         } catch (err) {
             res.status(500).json("somthing went wrong!");

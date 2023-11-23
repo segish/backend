@@ -17,7 +17,8 @@ const getAll = async (req, res) => {
         if (!currentUser.isSubstore) return res.status(403).json("You are not allowed for this service")
         try {
             const substorehistories = currentUser.isSubstore ? await History.find({ warehouseType: "subStore" }) : [];
-            res.status(200).json(substorehistories.sort({ createdAt: 'desc' }));
+            const sortedHistory = substorehistories.sort((a, b) => b.createdAt - a.createdAt);
+            res.status(200).json(sortedHistory);
         } catch (err) {
             res.status(500).json("somthing went wrong!");
         }
