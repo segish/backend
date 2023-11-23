@@ -19,7 +19,7 @@ const getAll = async (req, res) => {
             const shophistories = await sallsHistory.find({ from: currentUser.warehouseName });
             const substorehistories = currentUser.isSubstore ? await sallsHistory.find({ warehouseType: "subStore" }) : [];
             const unsortedHistory = shophistories.concat(substorehistories);
-            const sortedHistory = unsortedHistory.sort((a, b) => b.createdAt - a.createdAt);
+            const sortedHistory = unsortedHistory.sort((a, b) => a.createdAt - b.createdAt);
             res.status(200).json(sortedHistory);
         } catch (err) {
             res.status(500).json("somthing went wrong!");
