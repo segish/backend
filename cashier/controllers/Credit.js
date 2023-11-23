@@ -89,9 +89,9 @@ const getAll = async (req, res) => {
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
 
-
-            res.status(200).json(mappedShopCredit.concat(mappedCreditAtPendingsaleShop).concat(mappedSubstoreCredit)
-                .concat(mappedCreditAtPendingsaleSubstore).concat(mappedHalfCreditAtPendingsaleShop).concat(mappedHalfCreditAtPendingsaleSubstore));
+            const unsortedCredit = mappedShopCredit.concat(mappedCreditAtPendingsaleShop).concat(mappedSubstoreCredit).concat(mappedCreditAtPendingsaleSubstore).concat(mappedHalfCreditAtPendingsaleShop).concat(mappedHalfCreditAtPendingsaleSubstore)
+            const sortedCredit = unsortedCredit.sort((a, b) => a.createdAt - b.createdAt);
+            res.status(200).json(sortedCredit);
         } catch (err) {
             res.status(500).json("somthing went wrong!");
         }
