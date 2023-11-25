@@ -114,7 +114,6 @@ const HoleSall = async (req, res) => {
             if (quantity > currentQuantity) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
             if (paymentMethod === "halfpaid") {
 
-                const paymentDate = req.body.paymentDate;
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
@@ -149,7 +148,7 @@ const HoleSall = async (req, res) => {
                     amount: amount - paidamount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    paymentDate: paymentDate,
+                    creditedDate: this.createdAt,
                     cheque: cheque || "____",
                     creditType: "half"
                 });
@@ -159,7 +158,6 @@ const HoleSall = async (req, res) => {
             } else if (paymentMethod === "credit") {
 
                 const phone = req.body.phone;
-                const paymentDate = req.body.paymentDate;
                 const cheque = req.body.cheque;
 
                 const newCcredit = new Credits({
@@ -174,7 +172,7 @@ const HoleSall = async (req, res) => {
                     amount: amount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    paymentDate: paymentDate,
+                    creditedDate: this.createdAt,
                     cheque: cheque || "____",
                 });
                 await newCcredit.save();

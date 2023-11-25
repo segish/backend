@@ -29,7 +29,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.warehouseName,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -40,7 +40,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.warehouseName,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -51,7 +51,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -62,7 +62,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -73,7 +73,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -84,13 +84,13 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                paymentDate: item.paymentDate,
+                creditedDate: item.creditedDate,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
 
             const unsortedCredit = mappedShopCredit.concat(mappedCreditAtPendingsaleShop).concat(mappedSubstoreCredit).concat(mappedCreditAtPendingsaleSubstore).concat(mappedHalfCreditAtPendingsaleShop).concat(mappedHalfCreditAtPendingsaleSubstore)
-            const sortedCredit = unsortedCredit.sort((a, b) => a.createdAt - b.createdAt);
+            const sortedCredit = unsortedCredit.sort((a, b) => a.creditedDate - b.creditedDate);
             res.status(200).json(sortedCredit);
         } catch (err) {
             res.status(500).json("somthing went wrong!");
@@ -112,7 +112,6 @@ const approveCredit = async (req, res) => {
         try {
             const tobeUpdated = req.params.id;
             const isCreditAtPendingSale = req.body.isCreditAtPendingSale;
-            console.log(isCreditAtPendingSale)
             if (isCreditAtPendingSale) {
                 await SallesPending.findByIdAndUpdate(tobeUpdated, {
                     $set: { approvedByCashier: true },

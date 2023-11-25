@@ -44,9 +44,6 @@ const SallesPendingSchema = new mongoose.Schema({
     paidamount: {
         type: Number,
     },
-    paymentDate: {
-        type: String,
-    },
     phone: {
         type: String,
     },

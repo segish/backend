@@ -118,7 +118,7 @@ const ApprovePending = async (req, res) => {
                     amount: pending.amount - pending.paidamount,
                     phone: pending.phone,
                     warehouseName: pending.from,
-                    paymentDate: pending.paymentDate,
+                    creditedDate: pending.createdAt,
                     cheque: pending.cheque,
                     creditType: "half",
                     approvedByCashier:pending.approvedByCashier,
@@ -138,7 +138,7 @@ const ApprovePending = async (req, res) => {
                     amount: pending.amount,
                     phone: pending.phone,
                     warehouseName: pending.from,
-                    paymentDate: pending.paymentDate,
+                    creditedDate: pending.createdAt,
                     cheque: pending.cheque,
                     approvedByCashier: pending.approvedByCashier,
                 });

@@ -21,7 +21,6 @@ const transaction = async (req, res) => {
             const customerName = req.body.customerName;
             const paymentMethod = req.body.paymentMethod;
             const amount = parseFloat(req.body.amount) * quantity;
-            const paymentDate = req.body.paymentDate;
             const phone = req.body.phone;
             const cheque = req.body.cheque;
 
@@ -40,7 +39,6 @@ const transaction = async (req, res) => {
             if (paymentMethod === "halfpaid") {
 
                 const phone = req.body.phone;
-                const paymentDate = req.body.paymentDate;
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
@@ -61,7 +59,6 @@ const transaction = async (req, res) => {
                     warehouseType: "shop",
                     amount: amount,
                     paidamount: paidamount,
-                    paymentDate: paymentDate,
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "retail",
@@ -110,7 +107,6 @@ const transaction = async (req, res) => {
                     paymentMethod: paymentMethod,
                     warehouseType: "shop",
                     amount: amount,
-                    paymentDate: paymentDate,
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "retail",

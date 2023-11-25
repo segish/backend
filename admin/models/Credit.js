@@ -34,7 +34,7 @@ const CreditSchema = new mongoose.Schema({
     warehouseName: {
         type: String,
     },
-    paymentDate: {
+    creditedDate: {
         type: String,
     },
     cheque: {

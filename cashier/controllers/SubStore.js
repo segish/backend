@@ -81,7 +81,6 @@ const HoleSall = async (req, res) => {
             const customerName = req.body.customerName;
             const paymentMethod = req.body.paymentMethod;
             const amount = parseFloat(req.body.amount) * quantity;
-            const paymentDate = req.body.paymentDate;
             const phone = req.body.phone;
             const cheque = req.body.cheque;
             if (!amount || !quantity || !paymentMethod) return res.status(400).json("please enter all required inputs!");
@@ -100,7 +99,6 @@ const HoleSall = async (req, res) => {
             if (paymentMethod === "halfpaid") {
 
                 const phone = req.body.phone;
-                const paymentDate = req.body.paymentDate;
                 const cheque = req.body.cheque;
                 const paidamount = parseFloat(req.body.paidamount);
                 const halfPayMethod = req.body.halfPayMethod;
@@ -121,7 +119,6 @@ const HoleSall = async (req, res) => {
                     warehouseType: "subStore",
                     amount: amount,
                     paidamount: paidamount,
-                    paymentDate: paymentDate,
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "Hole",
@@ -170,7 +167,6 @@ const HoleSall = async (req, res) => {
                     paymentMethod: paymentMethod,
                     warehouseType: "subStore",
                     amount: amount,
-                    paymentDate: paymentDate,
                     phone: phone,
                     cheque: cheque || "____",
                     sellType: "Hole",
