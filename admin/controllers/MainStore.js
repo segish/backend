@@ -172,7 +172,7 @@ const HoleSall = async (req, res) => {
                     amount: amount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: "this.createdAt",
                     cheque: cheque || "____",
                 });
                 await newCcredit.save();
