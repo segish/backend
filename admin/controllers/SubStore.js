@@ -75,7 +75,7 @@ const HoleSall = async (req, res) => {
                     amount: amount - paidamount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                     creditType: "half"
                 });
@@ -98,7 +98,7 @@ const HoleSall = async (req, res) => {
                     amount: amount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                 });
                 await newCcredit.save();
@@ -158,7 +158,7 @@ const Subtransaction = async (req, res) => {
             const pendingToshopQuantity = parseInt(item.pendingToshopQuantity) || 0;
             const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
             if (quantity > (currentQuantity - (pendingToshopQuantity + pendingSaleQuantity))) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
-            
+
             if (quantity === currentQuantity && pendingSaleQuantity === 0 && pendingToshopQuantity === 0) {
 
                 if (existingItem) {
@@ -195,7 +195,7 @@ const Subtransaction = async (req, res) => {
                 currentItem.quantity = currentQuantity - quantity;
                 await currentItem.save();
                 res.status(200).json(currentItem);
-            } 
+            }
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }
@@ -245,7 +245,7 @@ const transaction = async (req, res) => {
                 } else {
                     res.status(500).json("Something went wrong!");
                 }
-            } 
+            }
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }

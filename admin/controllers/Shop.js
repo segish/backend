@@ -36,7 +36,7 @@ const transaction = async (req, res) => {
 
             const currentQuantity = parseInt(item.quantity) || 0;
             const pendingSaleQuantity = parseInt(item.pendingSaleQuantity) || 0;
-            if (quantity > (currentQuantity-pendingSaleQuantity)) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
+            if (quantity > (currentQuantity - pendingSaleQuantity)) return res.status(400).json("Invalid quantity. Cannot remove more items than available.");
 
 
             if (paymentMethod === "halfpaid") {
@@ -74,7 +74,7 @@ const transaction = async (req, res) => {
                     amount: amount - paidamount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                     creditType: "half"
                 });
@@ -98,7 +98,7 @@ const transaction = async (req, res) => {
                     amount: amount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                 });
                 await newCcredit.save();

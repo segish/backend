@@ -42,7 +42,7 @@ const addToMainstore = async (req, res) => {
                 warehouseName: warehouseName,
             });
             await newItem.save();
-            res.status(200).json(name+" added to main store successfully!");
+            res.status(200).json(name + " added to main store successfully!");
         } catch (err) {
             res.status(500).json("Something went wrong!");
         }
@@ -148,7 +148,7 @@ const HoleSall = async (req, res) => {
                     amount: amount - paidamount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: this.createdAt,
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                     creditType: "half"
                 });
@@ -172,7 +172,7 @@ const HoleSall = async (req, res) => {
                     amount: amount,
                     phone: phone,
                     warehouseName: item.warehouseName,
-                    creditedDate: "this.createdAt",
+                    creditedDate: new Date(),
                     cheque: cheque || "____",
                 });
                 await newCcredit.save();
