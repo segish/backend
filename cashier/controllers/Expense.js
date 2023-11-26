@@ -69,15 +69,17 @@ const totalSaleAndExpense = async (req, res) => {
       if (!currentUser) return res.status(403).json("only cashier can access expenses");
       const today = new Date(); // Get the current date
       const fromWarehouseName = req.body.warehouseName && currentUser.isSubstore ? req.body.warehouseName : currentUser.warehouseName
-      console.log(fromWarehouseName)
+      const startOfDay = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0, 0));
+      const endOfDay = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999));
+
       const cashPipeline = [
         {
           $match: {
             from: fromWarehouseName,
             paymentMethod: "cash",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -95,8 +97,8 @@ const totalSaleAndExpense = async (req, res) => {
             paymentMethod: "halfpaid",
             halfPayMethod: "cash",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -113,8 +115,8 @@ const totalSaleAndExpense = async (req, res) => {
             from: fromWarehouseName,
             paymentMethod: "cash/transfer",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -131,8 +133,8 @@ const totalSaleAndExpense = async (req, res) => {
             from: fromWarehouseName,
             paymentMethod: "cash/transfer",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -150,8 +152,8 @@ const totalSaleAndExpense = async (req, res) => {
             from: fromWarehouseName,
             paymentMethod: "credit",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -168,8 +170,8 @@ const totalSaleAndExpense = async (req, res) => {
             from: fromWarehouseName,
             paymentMethod: "halfpaid",
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -186,8 +188,8 @@ const totalSaleAndExpense = async (req, res) => {
             from: fromWarehouseName,
             paymentMethod: { $regex: "transfer\\(Bank Name" }, 
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -206,8 +208,8 @@ const totalSaleAndExpense = async (req, res) => {
             paymentMethod: "halfpaid",
             halfPayMethod: { $regex: "transfer\\(Bank N" },
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
@@ -225,8 +227,8 @@ const totalSaleAndExpense = async (req, res) => {
             warehouseName: fromWarehouseName,
             approved:false,
             createdAt: {
-              $gte: new Date(today.setHours(0, 0, 0, 0)), // Start of today
-              $lt: new Date(today.setHours(23, 59, 59, 999)), // End of today
+              $gte: startOfDay, // Start of today
+              $lt: endOfDay, // End of today
             },
           },
         },
