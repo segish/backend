@@ -51,7 +51,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                creditedDate: item.creditedDate,
+                creditedDate: item.createdAt,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -62,7 +62,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                creditedDate: item.creditedDate,
+                creditedDate: item.createdAt,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -73,7 +73,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                creditedDate: item.creditedDate,
+                creditedDate: item.createdAt,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
@@ -84,7 +84,7 @@ const getAll = async (req, res) => {
                 itemCode: item.itemCode,
                 phone: item.phone,
                 warehouseName: item.from,
-                creditedDate: item.creditedDate,
+                creditedDate: item.createdAt,
                 cheque: item.cheque,
                 isCreditAtPendingSale: item.isCreditAtPendingSale
             }));
