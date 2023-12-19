@@ -37,5 +37,5 @@ const SellsHistorySchema = new mongoose.Schema({
 },
     { timestamps: true },
 );
-
+SellsHistorySchema.index({ createdAt: 1 }, { expireAfterSeconds: 31536000 });//to be deleted after one year
 module.exports = mongoose.model("SellsHistory", SellsHistorySchema);
